@@ -2,6 +2,7 @@ import unittest
 
 from app import create_app
 
+
 class BaseTestConfig(unittest.TestCase):
 
     def setUp(self) -> None:
@@ -11,7 +12,6 @@ class BaseTestConfig(unittest.TestCase):
         self.app_context = self.app.app_context()
 
         self.app_context.push()
-
 
     def tearDown(self) -> None:
         

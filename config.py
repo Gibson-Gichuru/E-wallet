@@ -11,25 +11,26 @@ class Development(Config):
     @staticmethod
     def init_app(app):
 
-        pass 
+        pass
+
 
 class Testing(Config):
 
-    TESTING = True 
+    TESTING = True
 
     @staticmethod
     def init_app(app):
 
-        pass 
-    
+        pass
+
 
 class Production(Config):
-
 
     @staticmethod
     def init__app(app):
 
         pass
+
 
 config = {
 

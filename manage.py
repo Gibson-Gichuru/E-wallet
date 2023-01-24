@@ -1,7 +1,9 @@
-import os, sys
+import os
+import sys
 from app import create_app
 
 app = create_app(os.getenv("CONFIG") or "default")
+
 
 @app.cli.command()
 def test():
