@@ -9,6 +9,6 @@ server {
 
         # proxy pass to a unix socket
 
-        proxy_pass http://unix:/run/e-wallet/e-wallet.sock
+        proxy_pass http://unix:/run/e-wallet/e-wallet.sock;
     }
 }
