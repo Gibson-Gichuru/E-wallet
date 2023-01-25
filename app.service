@@ -1,0 +1,11 @@
+[Unit]
+Description="E-wallet Api Service"
+After=network.target
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet
+Environment="PATH=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet/env/bin"
+ExecStart=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet/env/bin/gunicorn -w 1 -b unix:/run/e-wallet/e-wallet.sock -m 007 manage:app
+[Install]
+WantedBy=multi-user.target
