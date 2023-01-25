@@ -52,7 +52,9 @@ function configure_nginx(){
 
     export SERVER_NAME=$(dig +short myip.opendns.com @resolver1.opendns.com)
 
-    sudo envsubst < $PWD/e-wallet.conf.template > /etc/nginx/sites-available/e-wallet.conf && nginx -g 'daemon off;'
+    sudo envsubst < $PWD/e-wallet.conf.template > $PWD/e-wallet.conf
+
+    sudo cp $PWD/e-wallet /etc/nginx/sites-available
 
     sudo ln -sf /etc/nginx/sites-available/e-wallet.conf /etc/nginx/sites-enabled
 
