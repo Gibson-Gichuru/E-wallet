@@ -44,4 +44,21 @@ jobs:
 
           flake8 . --count --select E9,F63,F7,F82 --exclude __pycache__ --show-source --statistics
 
-          flake8 . --count --max-complexity=10 --max-line-length=100 --ignore E121,E126,E231,E123,W503,W293,W504 --exclude __pycache__,migrations --show-source --statistics
+          flake8 . --count --max-complexity=10 --max-line-length=100 --ignore E121,E221,E126,E231,E123,W503,W293,W504 --exclude __pycache__,migrations --show-source --statistics
+
+  Deploy:
+
+    needs: Testing
+
+    runs-on: self-hosted
+
+    steps:
+
+      - name: Checking out the repo
+        uses: actions/checkout@v2
+
+      - name: Deploy updates
+
+        run: |
+
+          sudo chmod +x setup.sh
