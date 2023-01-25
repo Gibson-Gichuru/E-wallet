@@ -12,18 +12,22 @@ function deploy_update(){
 
     if [ -f "/etc/systemd/system/e-wallet.service" ]; then
 
-        echo "Service file found"
+        echo "[:] Service file found"
 
         # installing updates
 
         install_updates
+
+        echo "[:] Reconfiguring Nginx :) just in case..."
+
+        configure_nginx
 
         sudo systemctl reload-or-restart e-wallet
 
 
     else
 
-        echo "Setting up e-wallet service file"
+        echo "[:] Setting up e-wallet service file"
 
         sudo cp $PWD/e-wallet.service "/etc/systemd/system"
 
@@ -50,11 +54,15 @@ function install_updates(){
 
 function configure_nginx(){
 
-    export SERVER_NAME=$(dig +short myip.opendns.com @resolver1.opendns.com)
+    echo "[:] Fetching public Ip address.."
 
-    sudo envsubst < $PWD/e-wallet.conf.template > $PWD/e-wallet.conf
+    export SERVER_NAME=`dig +short myip.opendns.com @resolver1.opendns.com`
 
-    sudo cp $PWD/e-wallet /etc/nginx/sites-available
+    export PORT=80
+
+    envsubst < $PWD/e-wallet.conf.template > e-wallet.conf
+
+    sudo cp $PWD/e-wallet.conf /etc/nginx/sites-available
 
     sudo ln -sf /etc/nginx/sites-available/e-wallet.conf /etc/nginx/sites-enabled
 
