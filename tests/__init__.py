@@ -13,6 +13,8 @@ class BaseTestConfig(unittest.TestCase):
 
         self.app_context.push()
 
+        self.client = self.app.test_client()
+
     def tearDown(self) -> None:
         
         self.app_context.pop()
