@@ -1,0 +1,14 @@
+server {
+
+    listen ${PORT};
+    server_name ${SERVER_NAME};
+
+    location / {
+
+        include proxy_params;
+
+        # proxy pass to a unix socket
+
+        proxy_pass http://unix:/run/e-wallet/e-wallet.sock
+    }
+}
