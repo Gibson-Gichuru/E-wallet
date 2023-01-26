@@ -1,6 +1,7 @@
 from app import db
 from datetime import datetime
 
+
 class CrudOperations:
 
     def add(self, resource):
@@ -91,7 +92,7 @@ class Account(db.Model, CrudOperations):
         
         return "Account Holder: {}".format(
             self.holder.username,
-        ) 
+        )
 
 
 class Payment(db.Model, CrudOperations):
@@ -124,7 +125,7 @@ class Payment(db.Model, CrudOperations):
             self.transaction_id,
             self.amount,
             self.transaction_date
-        ) 
+        )
 
 
 class Task(db.Model, CrudOperations):
@@ -139,19 +140,17 @@ class Task(db.Model, CrudOperations):
 
     initiator = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable=False)
 
-
     def __init__(self, desc, initiator) -> None:
 
         self.task_description = desc
 
         self.initiator = initiator
 
-    
     def __repr__(self) -> str:
         
         return "{}".format(
             self.task_description
-        ) 
+        )
 
 
 class Status(db.Model, CrudOperations):
@@ -170,7 +169,7 @@ class Status(db.Model, CrudOperations):
 
     def __init__(self,name, actions, default=False) -> None:
         
-        self.status_name = name 
+        self.status_name = name
 
         self.actions = actions
 
@@ -178,7 +177,7 @@ class Status(db.Model, CrudOperations):
 
     def __repr__(self) -> str:
         
-        return "{}".format(self.status_name) 
+        return "{}".format(self.status_name)
 
     @staticmethod
     def register_actions():
@@ -190,7 +189,7 @@ class Status(db.Model, CrudOperations):
                  Actions.TOPUP |
                  Actions.STATEMENT |
                  Actions.WITHDRAW |
-                 Actions.BALANCECHECK   
+                 Actions.BALANCECHECK
                 ),False
             ),
             "Suspended":(

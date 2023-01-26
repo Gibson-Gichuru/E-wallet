@@ -1,5 +1,6 @@
 from tests import BaseTestConfig
-from app.models import Account, User, Status
+from app.models import User, Status
+
 
 class TestAccount(BaseTestConfig):
 
@@ -7,13 +8,12 @@ class TestAccount(BaseTestConfig):
         super().setUp()
 
         Status.register_actions()
-        
 
     def test_account_creation(self):
 
         """
-        Account is Deactivated by default 
-        when a user is registered 
+        Account is Deactivated by default
+        when a user is registered
         """
 
         user = User(username="test", phonenumber="245XXXX")

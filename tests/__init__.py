@@ -24,4 +24,3 @@ class BaseTestConfig(unittest.TestCase):
         self.app_context.pop()
 
         self.app = None
-

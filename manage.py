@@ -23,6 +23,7 @@ def handle_exception(e):
 
     return response
 
+
 @app.cli.command()
 def test():
 
@@ -35,6 +36,7 @@ def test():
     if not results.wasSuccessful():
 
         sys.exit()
+
 
 @app.shell_context_processor
 def shell_context():

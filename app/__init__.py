@@ -18,6 +18,7 @@ db = SQLAlchemy(metadata=meta_data)
 
 migrate = Migrate()
 
+
 def create_app(app_config: str) -> Flask:
 
     app = Flask(__name__)
