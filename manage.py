@@ -54,6 +54,8 @@ def shell_context():
 @app.cli.command()
 def migrate_db():
 
+    """Updating Database Schema"""
+
     from flask_migrate import upgrade
 
     upgrade()
