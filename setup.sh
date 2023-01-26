@@ -90,7 +90,7 @@ function database_migrate(){
 
         echo "[:] Applying latest migrations"
 
-        $PWD/env/bin/flask migrate_db
+        `$PWD/env/bin/flask migrate_db`
     fi
 
 }
