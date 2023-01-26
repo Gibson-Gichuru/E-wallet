@@ -18,6 +18,8 @@ function deploy_update(){
 
         install_updates
 
+        database_migrate
+
         echo "[:] Reconfiguring Nginx :) just in case..."
 
         configure_nginx
@@ -32,6 +34,8 @@ function deploy_update(){
         sudo cp $PWD/e-wallet.service "/etc/systemd/system"
 
         install_updates
+
+        database_migrate
 
         sudo systemctl daemon-reload
 
@@ -67,6 +71,28 @@ function configure_nginx(){
     sudo ln -sf /etc/nginx/sites-available/e-wallet.conf /etc/nginx/sites-enabled
 
     sudo nginx -s reload
+}
+
+function database_migrate(){
+
+    echo "[:] Checking migration updates"
+
+    DB_CURRENT_REVISION = `flask db current`
+
+    read -a REVISION_ARRAY <<< "$DB_CURRENT_REVISION"
+
+    MIGRATION_REVISION = `flask db heads`
+    
+    echo "[:] Current database schema revision $REVISION_ARRAY[0]"
+    echo "[:] Current migration schema revision $MIGRATION_REVISION[0]"
+
+    if [ "${REVISION_ARRAY[0]}" != "${MIGRATION_REVISION[0]}" ]; then
+
+        echo "[:] Applying latest migrations"
+
+        `flask migrate_db`
+    fi
+
 }
 
 deploy_update
