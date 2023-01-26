@@ -4,7 +4,7 @@ set -e
 
 trap 'current_command=$BASH_COMMAND' DEBUG
 
-trap 'echo "\"${current_command}\" command filed with exit code $?."' EXIT
+# trap 'echo "\"${current_command}\" command filed with exit code $?."' EXIT
 
 PWD=$(pwd)
 
