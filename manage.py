@@ -49,3 +49,13 @@ def shell_context():
         Status=Status,
         Task=Task
     )
+
+
+@app.cli.command()
+def migrate_db():
+
+    from flask_migrate import upgrade
+
+    upgrade()
+
+    Status.register_actions()
