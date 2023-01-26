@@ -79,20 +79,22 @@ function database_migrate(){
 
     DB_CURRENT_REVISION=`$PWD/env/bin/flask db current`
 
-    read -a REVISION_ARRAY <<< "$DB_CURRENT_REVISION"
+    read REVISION_ARRAY <<< "$DB_CURRENT_REVISION"
 
     MIGRATION_REVISION=`$PWD/env/bin/flask db heads`
     
-    echo "[:] Current database schema revision $REVISION_ARRAY[0]"
-    echo "[:] Current migration schema revision $MIGRATION_REVISION[0]"
+    echo "[:] Current database schema revision $REVISION_ARRAY"
+    echo "[:] Current migration schema revision $MIGRATION_REVISION"
 
-    if [ "${REVISION_ARRAY[0]}" != "${MIGRATION_REVISION[0]}" ]; then
+    if [ "$REVISION_ARRAY" != "$MIGRATION_REVISION" ]; then
 
         echo "[:] Applying latest migrations"
 
-        `$PWD/env/bin/flask migrate_db`
+        `$PWD/env/bin/flask migrate-db`
+
     fi
 
 }
+
 
 deploy_update
