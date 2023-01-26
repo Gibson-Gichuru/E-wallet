@@ -35,3 +35,15 @@ def test():
     if not results.wasSuccessful():
 
         sys.exit()
+
+@app.shell_context_processor
+def shell_context():
+
+    return dict(
+        User=User,
+        Account=Account,
+        Actions=Actions,
+        Payment=Payment,
+        Status=Status,
+        Task=Task
+    )
