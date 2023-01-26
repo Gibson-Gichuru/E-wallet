@@ -77,11 +77,11 @@ function database_migrate(){
 
     echo "[:] Checking migration updates"
 
-    DB_CURRENT_REVISION = `flask db current`
+    DB_CURRENT_REVISION = $PWD/env/bin/flask db current
 
     read -a REVISION_ARRAY <<< "$DB_CURRENT_REVISION"
 
-    MIGRATION_REVISION = `flask db heads`
+    MIGRATION_REVISION = $PWD/env/bin/flask flask db heads
     
     echo "[:] Current database schema revision $REVISION_ARRAY[0]"
     echo "[:] Current migration schema revision $MIGRATION_REVISION[0]"
@@ -90,7 +90,7 @@ function database_migrate(){
 
         echo "[:] Applying latest migrations"
 
-        `flask migrate_db`
+        $PWD/env/bin/flask migrate_db
     fi
 
 }
