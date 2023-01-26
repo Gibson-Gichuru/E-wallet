@@ -1,6 +1,6 @@
 import unittest
 
-from app import create_app
+from app import create_app, db
 
 
 class BaseTestConfig(unittest.TestCase):
@@ -13,10 +13,15 @@ class BaseTestConfig(unittest.TestCase):
 
         self.app_context.push()
 
+        db.create_all()
+        
         self.client = self.app.test_client()
 
     def tearDown(self) -> None:
+
+        db.drop_all()
         
         self.app_context.pop()
 
         self.app = None
+
