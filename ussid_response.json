@@ -1,0 +1,8 @@
+{
+    "welcome":"CON Would you like to register \n 1. Register Account \n 2. Cancel",
+    "register":"CON Enter your username",
+    "activate":"CON Want to activate your account? \n 1. Yes \n 2. No",
+    "main":"CON Main Menu. \n 1. Topup \n 2. Withdraw \n 3. Change Number \n .4 Deactivate \n .5 Cancel",
+    "cancel":"END This is E-wallet. \n Good Bye",
+    "reg_success":"End Account registered activation request has been sent please confirm the activaton fee by entering your mpesa pin"
+}
