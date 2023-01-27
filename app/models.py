@@ -94,6 +94,12 @@ class Account(db.Model, CrudOperations):
             self.holder.username,
         )
 
+    def can(self, action):
+
+        return self.status is not None and (
+            action & self.status.actions
+        ) == action
+
 
 class Payment(db.Model, CrudOperations):
 
