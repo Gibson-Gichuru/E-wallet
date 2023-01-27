@@ -5,6 +5,12 @@ server {
 
     location / {
 
+        deny all;
+
+        
+    }
+
+    location /ussid/callback {
         include proxy_params;
 
         # proxy pass to a unix socket
