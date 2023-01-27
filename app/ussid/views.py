@@ -5,6 +5,7 @@ import os
 import json
 from app.models import User
 
+
 class UssidCallback(MethodView):
 
     def __init__(self) -> None:

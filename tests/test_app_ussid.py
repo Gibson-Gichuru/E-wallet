@@ -65,14 +65,13 @@ class TestAccountRegistation(BaseTestConfig):
             menu.get("register")
         )
 
-    
     def test_client_terminates_session(self):
 
         """Session is terminated once the User selects cancel"""
 
         menu = Settings.get_ussid_menu()
 
-        response =  self.client.post(
+        response = self.client.post(
             Settings.ENDPOINT,
             data=Settings.make_request_body(text="2")
         )
@@ -82,14 +81,12 @@ class TestAccountRegistation(BaseTestConfig):
             menu.get("cancel")
         )
 
-
     def test_user_registration_sequence(self):
 
         """User Registration Sequence
             Assuming that the user has selected register as an option
 
         """
-
         menu = Settings.get_ussid_menu()
 
         response = self.client.post(
@@ -104,5 +101,3 @@ class TestAccountRegistation(BaseTestConfig):
         self.assertEqual(response.text,menu.get("reg_success"))
 
         self.assertIsNotNone(user)
-
-

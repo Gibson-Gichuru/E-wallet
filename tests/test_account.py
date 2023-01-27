@@ -24,7 +24,6 @@ class TestAccount(BaseTestConfig):
 
         Status.register_actions()
 
-
     def test_account_creation(self):
 
         """
@@ -66,14 +65,6 @@ class TestAccount(BaseTestConfig):
 
 class TestAccountActivation(BaseTestConfig):
 
-
     def test_user_account_activation(self):
 
-        """
-            Once a user is added to the database a task is scheduled
-
-        """
-        user = create_user()
-
-        # mock redis enqueue function and assert that it was called
         pass
