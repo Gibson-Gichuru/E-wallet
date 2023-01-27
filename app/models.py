@@ -61,7 +61,7 @@ class User(db.Model, CrudOperations):
         self.account  = Account()
 
     def __repr__(self) -> str:
-        return "User: {}".format(self.usename)
+        return "User: {}".format(self.username)
 
 
 class Account(db.Model, CrudOperations):
