@@ -3,6 +3,7 @@ from flask import request
 from config import base_dir
 import os
 import json
+import re
 from app.models import User
 
 
@@ -43,8 +44,10 @@ class UssidCallback(MethodView):
                 return self.menu_text.get("cancel")
 
             else:
-                # validate user inputs
-                user = User(username=text, phonenumber=phone_number)
+                
+                name = "".join(re.findall("[a-zA-Z]",text))
+
+                user = User(username=name, phonenumber=phone_number)
 
                 user.add(user)
 
