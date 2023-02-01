@@ -9,7 +9,7 @@ class Settings:
     ENDPOINT = "/ussid/callback"
 
     @staticmethod
-    def create_user(active=False):
+    def create_user(active=False, suspended=False):
 
         user = User(
             username="test",
@@ -20,6 +20,14 @@ class Settings:
 
             account_status = Status.query.filter_by(
                 status_name="Active"
+            ).first()
+
+            user.account.status = account_status
+
+        if suspended:
+
+            account_status = Status.query.filter_by(
+                status_name="Suspended"
             ).first()
 
             user.account.status = account_status
