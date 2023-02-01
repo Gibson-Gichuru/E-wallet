@@ -49,6 +49,8 @@ class TestAccountRegistation(BaseTestConfig):
 
         Status.register_actions()
 
+        self.menu = Settings.get_ussid_menu()
+
     def test_register_screen(self):
 
         """Show a new user Register Option"""
@@ -69,7 +71,6 @@ class TestAccountRegistation(BaseTestConfig):
 
         """Session is terminated once the User selects cancel"""
 
-        menu = Settings.get_ussid_menu()
 
         response = self.client.post(
             Settings.ENDPOINT,
@@ -78,7 +79,7 @@ class TestAccountRegistation(BaseTestConfig):
 
         self.assertEqual(
             response.text,
-            menu.get("cancel")
+            self.menu.get("cancel")
         )
 
     def test_user_registration_sequence(self):
