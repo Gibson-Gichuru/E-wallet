@@ -40,7 +40,7 @@ class Settings:
         return {
             "sessionId":"test1234",
             "sessionCode":"test",
-            "phoneNumber":os.environ.get("PHONENUMBER"),
+            "phoneNumber":os.environ.get("PHONENUMBER","254XXXXXX"),
             "text":text
         }
 
