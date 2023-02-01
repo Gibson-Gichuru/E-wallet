@@ -116,7 +116,7 @@ class UssidCallback(MethodView):
         text = request.values.get("text", "default")
 
         user = User.query.filter_by(
-            phonenumber=phone_number
+            phonenumber=phone_number.replace("+", "")
         ).first()
 
         if self.process_input(text)[0] == 1:
