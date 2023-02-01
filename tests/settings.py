@@ -13,7 +13,7 @@ class Settings:
 
         user = User(
             username="test",
-            phonenumber=os.environ.get("PHONENUMBER")
+            phonenumber=os.environ.get("PHONENUMBER","254XXXXXX")
         )
 
         if active:
