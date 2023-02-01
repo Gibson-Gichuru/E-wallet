@@ -59,7 +59,6 @@ class UssidCallback(MethodView):
 
         return self.menu_text.get("cancel")
 
-
     def process_level_1_menu_option_3(self, user):
 
         balance = float(user.account.balance)
@@ -68,12 +67,11 @@ class UssidCallback(MethodView):
             "check_balance"
         ) + "{}".format(balance)
 
-
     def process_level_1_menu_option_4(self, user):
 
         # Todo implement statement processing
 
-        return self.menu_text.get("statement") 
+        return self.menu_text.get("statement")
 
     def process_level_1_menu_option_5(self, user):
 
@@ -161,7 +159,6 @@ class UssidCallback(MethodView):
                     text=fine_text,
                     phone_number=phone_number
                 )
-
 
             if user.account.can(Actions.TRANSACT):
 

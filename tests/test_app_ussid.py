@@ -71,7 +71,6 @@ class TestAccountRegistation(BaseTestConfig):
 
         """Session is terminated once the User selects cancel"""
 
-
         response = self.client.post(
             Settings.ENDPOINT,
             data=Settings.make_request_body(text="2")
@@ -175,6 +174,7 @@ class TestAccountRegistation(BaseTestConfig):
             self.menu.get("deactivate")
         )
 
+
 class TransactionTests(BaseTestConfig):
 
     def setUp(self) -> None:
@@ -194,7 +194,6 @@ class TransactionTests(BaseTestConfig):
             Settings.ENDPOINT,
             data=Settings.make_request_body(text=text)
         )
-
 
     def test_topup_complete_response(self):
 
