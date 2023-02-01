@@ -4,16 +4,16 @@
     "activate":"CON Want to activate your account? \n 1. Yes \n 2. No",
     "activate_accept":"END request received. \n your will notified soon",
     "activate_reject":"END account not activated",
-    "main":"CON Main Menu. \n 1. Topup \n 2. Withdraw \n 3. Change Number \n .4 Deactivate \n .5 Cancel",
+    "main":"CON Main Menu. \n 1. Topup \n 2. Withdraw \n 3. Balance \n .4 Statement \n .5 Deactivate \n .6 Cancel",
     "cancel":"END This is E-wallet. \n Good Bye",
-    "reg_success":"END Account registered activation request has been sent please confirm the activaton fee by entering your mpesa pin",
+    "reg_success":"END Account registered activation request has been sent \n please confirm the activaton fee by entering your mpesa pin",
     "suspended":"END sorry this account has been suspended",
     "top_up":"END TOP UP Feature still under development",
-    "check_balance":"CON Your current Account balance is: ",
+    "check_balance":"END Your current Account balance is: ",
     "statement":"END Your request is being processed",
     "deactivate":"END Your accounth has been deactivated. \n You can no longer transact untill you reactivate",
     "invalid":"END Invalid option",
-    "topup_success":"END A Transaction request have been made to your phone",
+    "topup_success":"END A Transaction request have been made to your phone \n Confirm it by entering your mpesa pin",
     "withdraw_success":"END Request received you will get a confirmation message soon",
-    "withdraw":"END with feature still under development"
+    "withdraw":"END with feature still under maintanance"
 }
