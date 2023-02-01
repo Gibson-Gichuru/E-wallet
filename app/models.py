@@ -23,9 +23,9 @@ class CrudOperations:
 
 class Actions:
 
-    TOPUP = 0X01
+    NOACTION = 0X00
 
-    WITHDRAW = 0X02
+    TRANSACT = 0X01 | 0X02
 
     STATEMENT = 0X04
 
@@ -192,16 +192,14 @@ class Status(db.Model, CrudOperations):
             "Active":(
                 (
                  Actions.DEACTIVATE |
-                 Actions.TOPUP |
+                 Actions.TRANSACT |
                  Actions.STATEMENT |
-                 Actions.WITHDRAW |
                  Actions.BALANCECHECK
                 ),False
             ),
             "Suspended":(
                 (
-                    Actions.ACTIVATE |
-                    Actions.STATEMENT
+                    Actions.NOACTION
                 ),False
             ),
             "Deactivated":(
