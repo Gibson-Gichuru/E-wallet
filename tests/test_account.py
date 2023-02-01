@@ -46,25 +46,16 @@ class TestAccount(BaseTestConfig):
 
         user = create_user()
 
-        self.assertFalse(user.account.can(Actions.TOPUP))
-
-        self.assertFalse(user.account.can(Actions.WITHDRAW))
+        self.assertFalse(user.account.can(Actions.TRANSACT))
 
     def test_suspended_account(self):
 
-        """Suspended account can only request for activation and statement"""
+        """Suspended account can not perform any action"""
 
         user = create_user(account_default=False, account_status="Suspended")
 
         user.add(user)
 
-        self.assertTrue(user.account.can(Actions.STATEMENT))
+        self.assertTrue(user.account.can(Actions.NOACTION))
 
-        self.assertTrue(user.account.can(Actions.ACTIVATE))
-
-
-class TestAccountActivation(BaseTestConfig):
-
-    def test_user_account_activation(self):
-
-        pass
+        self.assertFalse(user.account.can(Actions.TRANSACT))
