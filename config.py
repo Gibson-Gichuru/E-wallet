@@ -7,6 +7,8 @@ base_dir = os.path.abspath(os.path.dirname(__file__))
 class Config:
 
     SECRETE_KEY = os.getenv("SECRETE_KEY")
+
+    MPESA_BASE_URL="https://sandbox.safaricom.co.ke"
      
 
 class Development(Config):
