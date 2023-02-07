@@ -101,7 +101,7 @@ class Mpesa:
             "PartyA": phonenumber,
             "PartyB": current_app.config.get("BUSINESS_SHORT_CODE"),
             "PhoneNumber": phonenumber,
-            "CallBackURL": "",
+            "CallBackURL": current_app.config.get("STK_CALLBACK"),
             "AccountReference": "E-wallet",
             "TransactionDesc": "Account Deposit" 
         }
