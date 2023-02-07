@@ -1,8 +1,10 @@
 from tests import BaseTestConfig
+from tests.settings import Settings
 from app.mpesa import Mpesa, MpesaConsts
 from unittest import mock
 from requests.exceptions import RequestException
 from datetime import datetime
+from collections import namedtuple
 import base64
 
 
@@ -32,7 +34,7 @@ class TestMpesaAuth(BaseTestConfig):
     def test_auth_token_called(self,request_mock):
 
         # assert that tokens were fetched
-        auth_tokens = self.mpesa.auth_tokens()
+        self.mpesa.auth_tokens()
 
         request_mock.get.assert_called()
 
@@ -65,6 +67,10 @@ class TestMpesaSTK(BaseTestConfig):
         
         super().setUp()
 
+        self.mpesa = Mpesa()
+
+        self.stk_results = namedtuple("Results", "succes")
+
         self.expected_time = datetime.strptime(
             "20230206145044",
             MpesaConsts.TIMESTAMP_FORMAT.value
@@ -79,6 +85,7 @@ class TestMpesaSTK(BaseTestConfig):
         self.expected_pass = base64.b64encode(
             self.encoded_string.encode("utf-8")
         )
+
       
     @mock.patch("app.mpesa.base64", autospec=True)
     @mock.patch("app.mpesa.datetime", autospec=True)
@@ -95,3 +102,33 @@ class TestMpesaSTK(BaseTestConfig):
         )
 
         self.assertEqual(self.expected_pass, mpesa_password)
+
+    @mock.patch("app.mpesa.requests", autospec=True)
+    def test_mpesa_stk_push_success(self, request_mock):
+
+        request_mock.post.return_value = Settings.stk_push_ack()
+
+        results = self.mpesa.stk_push(
+            amount=10,
+            phonenumber="test"
+        )
+
+        self.assertEqual(
+            results,self.stk_results(True)
+        )
+
+    @mock.patch("app.mpesa.requests")
+    def test_mpesa_stk_push_fail(self, request_mock):
+
+        request_mock.post.side_effect = RequestException
+
+        response = self.mpesa.stk_push(
+            amount=10,
+            phonenumber="test"
+        )
+
+        self.assertEqual(
+            response, 
+            self.stk_results(False)
+        )
+    

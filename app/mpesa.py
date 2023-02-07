@@ -3,6 +3,7 @@ from requests.exceptions import RequestException
 from flask import current_app
 from enum import Enum
 from datetime import datetime
+from collections import namedtuple
 import base64
 
 
@@ -15,6 +16,11 @@ class MpesaConsts(Enum):
     TIMESTAMP_FORMAT="%Y%m%d%H%M%S"
 
 class Mpesa:
+
+    def __init__(self):
+
+        self.stk_results = namedtuple("Results", "success")
+
 
     @staticmethod
     def encode(consumer_key, consumer_secret):
@@ -64,3 +70,54 @@ class Mpesa:
             return None
 
         return tokens
+    
+    def stk_push(self, amount, phonenumber):
+
+        password = Mpesa.lipa_na_mpesa_pass()
+
+        tokens = self.auth_tokens()
+
+        timestamp = datetime.now().strftime(
+            MpesaConsts.TIMESTAMP_FORMAT.value
+        )
+
+        stk_full_uri = "{}{}".format(
+            current_app.config.get("MPESA_BASE_URL"),
+            MpesaConsts.LNM_URL.value
+        )
+
+        headers = {
+            'Content-Type': 'application/json',
+            'Authorization': f"Bearer {tokens}"
+        }
+
+        payload = {
+
+            "BusinessShortCode": 174379,
+            "Password": password,
+            "Timestamp": timestamp,
+            "TransactionType": "CustomerPayBillOnline",
+            "Amount": amount,
+            "PartyA": phonenumber,
+            "PartyB": current_app.config.get("BUSINESS_SHORT_CODE"),
+            "PhoneNumber": phonenumber,
+            "CallBackURL": "",
+            "AccountReference": "E-wallet",
+            "TransactionDesc": "Account Deposit" 
+        }
+
+        try:
+
+            requests.post(
+                stk_full_uri,
+                headers = headers,
+                data = payload
+            )
+
+        except RequestException:
+
+            return self.stk_results(False)
+
+        return self.stk_results(True)
+
+

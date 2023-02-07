@@ -52,3 +52,20 @@ class Settings:
             menu = json.load(file)
 
         return menu
+
+    @staticmethod
+    def stk_push_ack(success=True):
+
+        response = {
+            "MerchantRequestID": "test",
+            "CheckoutRequestID": "test",
+            "ResponseCode": "0",
+            "ResponseDescription": "test",
+            "CustomerMessage": "test"
+        }
+
+        if not success:
+
+            response["ResponseCode"] = "1"
+
+        return response
