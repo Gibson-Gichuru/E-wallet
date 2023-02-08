@@ -3,6 +3,7 @@ from config import config
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy import MetaData
+from redis import Redis
 
 conventions = {
     "ix": 'ix_%(column_0_label)s',
@@ -33,10 +34,16 @@ def create_app(app_config: str) -> Flask:
     
     migrate.init_app(app=app, db=db)
 
+    app.redis = Redis(unix_socket_path="/var/run/redis/redis-server.sock")
+
     # register blueprints
 
     from app.ussid import ussid_blueprint
 
+    from app.payments import payment_blueprint
+
     app.register_blueprint(ussid_blueprint)
+
+    app.register_blueprint(payment_blueprint)
 
     return app
