@@ -1,7 +1,7 @@
 import unittest
 
 from app import create_app, db
-
+from app.models import Status
 
 class BaseTestConfig(unittest.TestCase):
 
@@ -14,6 +14,8 @@ class BaseTestConfig(unittest.TestCase):
         self.app_context.push()
 
         db.create_all()
+
+        Status.register_actions()
         
         self.client = self.app.test_client()
 

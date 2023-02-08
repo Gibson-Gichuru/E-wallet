@@ -1,7 +1,7 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
 from app.mpesa import Mpesa, MpesaConsts
-from app.models import Status, Payment
+from app.models import Payment
 from unittest import mock
 from requests.exceptions import RequestException
 from datetime import datetime
@@ -149,8 +149,6 @@ class TestSTKCallBack(BaseTestConfig):
     def setUp(self):
 
         super().setUp()
-
-        Status.register_actions()
 
         self.user = Settings.create_user(active=True)
 

@@ -19,10 +19,6 @@ def create_user(account_default=True, account_status=None):
 
 class TestAccount(BaseTestConfig):
 
-    def setUp(self) -> None:
-        super().setUp()
-
-        Status.register_actions()
 
     def test_account_creation(self):
 

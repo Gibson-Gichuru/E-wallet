@@ -1,14 +1,10 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
-from unittest import mock
-from app.models import Status
 
 class TransactionTests(BaseTestConfig):
 
     def setUp(self) -> None:
         super().setUp()
-
-        Status.register_actions()
 
         self.menu = Settings.get_ussid_menu()
 

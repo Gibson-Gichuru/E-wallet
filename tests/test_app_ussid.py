@@ -1,14 +1,10 @@
 from tests import BaseTestConfig
-from app.models import Status, User
+from app.models import User
 from tests.settings import Settings
 
 
 class TestUssidCallbackRoute(BaseTestConfig):
 
-    def setUp(self) -> None:
-        super().setUp()
-
-        Status.register_actions()
             
     def test_unregistered_user_option(self):
 
@@ -46,8 +42,6 @@ class TestAccountRegistation(BaseTestConfig):
 
     def setUp(self) -> None:
         super().setUp()
-
-        Status.register_actions()
 
         self.menu = Settings.get_ussid_menu()
 
