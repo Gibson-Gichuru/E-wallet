@@ -7,6 +7,7 @@ from config import base_dir
 class Settings:
 
     ENDPOINT = "/ussid/callback"
+    STKCALLBACK = "/payment/stkcallback"
 
     @staticmethod
     def create_user(active=False, suspended=False):
@@ -69,3 +70,20 @@ class Settings:
             response["ResponseCode"] = "1"
 
         return response
+    
+    @staticmethod
+    def stk_callback_data(phonenumber, amount):
+
+        with open(os.path.join(base_dir, "tests/stk-response.json"), "r") as file:
+
+            data = json.load(file)
+
+        items = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"]
+
+        MpesaReceiptNumber = items[1]["Value"]
+
+        items[-1]["Value"] = phonenumber
+
+        items[0]["Value"] = amount
+
+        return data,MpesaReceiptNumber
