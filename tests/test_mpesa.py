@@ -1,12 +1,13 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
 from app.mpesa import Mpesa, MpesaConsts
+from app.models import Status, Payment
 from unittest import mock
 from requests.exceptions import RequestException
 from datetime import datetime
 from collections import namedtuple
 import base64
-
+import json
 
 class TestMpesaAuth(BaseTestConfig):
 
@@ -28,7 +29,6 @@ class TestMpesaAuth(BaseTestConfig):
         b64_mock.b64encode.assert_called_with(
             f"{consumer_key}:{consumer_secret}".encode("utf-8")
         )
-
 
     @mock.patch("app.mpesa.requests", autospec=True)
     def test_auth_token_called(self,request_mock):
@@ -103,10 +103,13 @@ class TestMpesaSTK(BaseTestConfig):
 
         self.assertEqual(self.expected_pass, mpesa_password)
 
+    @mock.patch("app.mpesa.current_app.redis")
     @mock.patch("app.mpesa.requests", autospec=True)
-    def test_mpesa_stk_push_success(self, request_mock):
+    def test_mpesa_stk_push_success(self, request_mock, redis_mock):
 
-        request_mock.post.return_value = Settings.stk_push_ack()
+        stk_ack_data = Settings.stk_push_ack()
+
+        request_mock.post.return_value = stk_ack_data
 
         results = self.mpesa.stk_push(
             amount=10,
@@ -116,6 +119,14 @@ class TestMpesaSTK(BaseTestConfig):
         self.assertEqual(
             results,self.stk_results(True)
         )
+
+        # assert that  stk push info is cached
+
+        redis_mock.set.assert_called_with(
+            stk_ack_data.get("CheckoutRequestID"),
+            "test"
+        )
+
 
     @mock.patch("app.mpesa.requests")
     def test_mpesa_stk_push_fail(self, request_mock):
@@ -131,4 +142,55 @@ class TestMpesaSTK(BaseTestConfig):
             response, 
             self.stk_results(False)
         )
-    
+
+
+class TestSTKCallBack(BaseTestConfig):
+
+    def setUp(self):
+
+        super().setUp()
+
+        Status.register_actions()
+
+        self.user = Settings.create_user(active=True)
+
+        self.user.add(self.user)
+
+    @mock.patch("app.payments.views.current_app.redis", autospec=True)
+    def test_stk_callback(self, redis_mock):
+
+        redis_mock.get.return_value = self.user.phonenumber.encode("utf-8")
+
+        stk_data = Settings.stk_callback_data(
+            phonenumber=self.user.phonenumber,
+            amount=10
+        )
+        self.client.post(
+            Settings.STKCALLBACK,
+            headers={"content-type": "application/json"},
+            data=json.dumps(stk_data[0]),
+        )
+
+        # assert the payment was recorded
+
+        payment = Payment.query.filter_by(
+            transaction_id= stk_data[-1]
+        ).first()
+
+        self.assertIsNotNone(payment)
+
+        # assert payment belongs to user account
+
+        self.assertEqual(
+            self.user.username,
+            payment.account.holder.username
+        )
+
+        # assert the user account balance has been updated
+
+        self.assertEqual(
+            self.user.account.balance,
+            10
+        )
+
+        

@@ -108,16 +108,19 @@ class Mpesa:
 
         try:
 
-            requests.post(
+            response = requests.post(
                 stk_full_uri,
                 headers = headers,
                 data = payload
-            )
+            )  
 
         except RequestException:
 
             return self.stk_results(False)
 
+        current_app.redis.set(
+                response.get("CheckoutRequestID"),
+                phonenumber
+            )
+
         return self.stk_results(True)
-
-
