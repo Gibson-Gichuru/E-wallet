@@ -4,6 +4,7 @@ from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
 from sqlalchemy import MetaData
 from redis import Redis
+from rq import Queue
 
 conventions = {
     "ix": 'ix_%(column_0_label)s',
@@ -35,6 +36,8 @@ def create_app(app_config: str) -> Flask:
     migrate.init_app(app=app, db=db)
 
     app.redis = Redis(unix_socket_path="/var/run/redis/redis-server.sock")
+
+    app.queue = Queue("E-wallet", connection=app.redis)
 
     # register blueprints
 
