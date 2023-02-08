@@ -1,6 +1,6 @@
 from app import db
 from datetime import datetime
-
+from flask import current_app
 
 class CrudOperations:
 
@@ -124,6 +124,7 @@ class Payment(db.Model, CrudOperations):
         self.transaction_date = date
 
         self.amount = amount
+
         
     def __repr__(self) -> str:
         
@@ -151,6 +152,11 @@ class Task(db.Model, CrudOperations):
         self.task_description = desc
 
         self.initiator = initiator
+
+    @staticmethod
+    def schedule(user, description=None, *args, **kwargs):
+
+        pass
 
     def __repr__(self) -> str:
         
@@ -222,3 +228,5 @@ class Status(db.Model, CrudOperations):
                 )
 
                 new_status.add(new_status)
+
+
