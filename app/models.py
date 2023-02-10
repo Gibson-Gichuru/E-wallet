@@ -80,6 +80,7 @@ class Account(db.Model, CrudOperations):
 
     payments = db.relationship("Payment", backref="account", lazy="dynamic")
 
+
     def __init__(self) -> None:
         
         default_status = Status.query.filter_by(
@@ -93,6 +94,20 @@ class Account(db.Model, CrudOperations):
         return "Account Holder: {}".format(
             self.holder.username,
         )
+
+    @staticmethod
+    def update_balance(*args, **kwargs):
+
+        if "account" in kwargs.keys():
+
+            account=kwargs.get("account")
+
+            amount=kwargs.get("amount", 0)
+
+            account.balance += amount
+
+
+
 
     def can(self, action):
 

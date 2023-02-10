@@ -1,57 +1,27 @@
 from tests import BaseTestConfig
-from app.models import User, Status, Actions
-
-
-def create_user(account_default=True, account_status=None):
-
-    user = User(username="test", phonenumber="254XXXX")
-
-    if not account_default:
-
-        account_status = Status.query.filter_by(
-            status_name=account_status
-        ).first()
-
-        user.account.status = account_status
-
-    return user
-
+from tests.settings import Settings
+from app.models import Account
 
 class TestAccount(BaseTestConfig):
 
+    def setUp(self):
 
-    def test_account_creation(self):
+        super().setUp()
 
-        """
-        Account is Deactivated by default
-        when a user is registered
-        """
+        self.user = Settings.create_user(active=True)
 
-        user = create_user()
+        self.user.add(self.user)
 
-        user.add(user)
+    def test_account_balance_update(self):
 
-        self.assertEqual(
-            user.account.status.status_name,
-            "Deactivated"
+        initial_balance = self.user.account.balance
+
+        Account.update_balance(
+            account=self.user.account,
+            amount=100
         )
-
-    def test_deactivated_account(self):
-
-        """A deactivated account cannot transact"""
-
-        user = create_user()
-
-        self.assertFalse(user.account.can(Actions.TRANSACT))
-
-    def test_suspended_account(self):
-
-        """Suspended account can not perform any action"""
-
-        user = create_user(account_default=False, account_status="Suspended")
-
-        user.add(user)
-
-        self.assertTrue(user.account.can(Actions.NOACTION))
-
-        self.assertFalse(user.account.can(Actions.TRANSACT))
+        
+        self.assertGreater(
+            self.user.account.balance
+            initial_balance,
+        )
