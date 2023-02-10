@@ -162,16 +162,31 @@ class Task(db.Model, CrudOperations):
 
     initiator = db.Column(db.Integer, db.ForeignKey("user.user_id"), nullable=False)
 
-    def __init__(self, desc, initiator) -> None:
+    def __init__(self, task_id, desc, initiator) -> None:
 
         self.task_description = desc
 
         self.initiator = initiator
 
-    @staticmethod
-    def schedule(user, description=None, *args, **kwargs):
+        self.task_id = task_id
 
-        pass
+    @staticmethod
+    def schedule(owner, target_func=None, description=None, *args, **kwargs):
+
+        job = current_app.queue.enqueue(
+            target_func,
+            description=description,
+            **kwargs
+        )
+
+        new_task = Task(
+            task_id=job.id,
+            desc=description,
+            initiator=owner
+        )
+
+        new_task.add(new_task)
+
 
     def __repr__(self) -> str:
         
