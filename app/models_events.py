@@ -1,9 +1,18 @@
-from .models import Payment, Task
+from .models import Payment, Account, Task
 from sqlalchemy import event
 
+
 @event.listens_for(Payment, "after_insert")
-def user_notification_after_payment(mapper, connection, target):
+def update_account_balance(mapper, connection, target):
 
-    task_owner = target.account.holder
+    job_owner = target.account.holder
 
-    Task.schedule(user=task_owner)
+    Task.schedule(
+        owner=job_owner,
+        description="Account balance update",
+        target_func=Account.update_balance,
+        kwargs={
+            "amount":target.amount,
+            "account":job_owner.account
+        }
+    )
