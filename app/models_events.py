@@ -12,8 +12,6 @@ def update_account_balance(mapper, connection, target):
         description="Account balance update",
         target_func=Account.update_balance,
         on_success=update_balance_success,
-        kwargs={
-            "amount":target.amount,
-            "account":job_owner.account
-        }
+        amount=target.amount,
+        account=job_owner.account
     )

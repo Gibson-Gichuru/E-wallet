@@ -45,13 +45,6 @@ class TestPayment(BaseTestConfig):
             description="Account balance update",
             target_func=payment_mock.update_balance,
             on_success=on_suc_mock,
-            kwargs={
-                "amount":self.amount,
-                "account":self.payment.account
-            }
+            amount=self.amount,
+            account=self.payment.account
         )
-
-
-
-
-    
