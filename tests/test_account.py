@@ -22,6 +22,6 @@ class TestAccount(BaseTestConfig):
         )
         
         self.assertGreater(
-            self.user.account.balance
+            self.user.account.balance,
             initial_balance,
         )
