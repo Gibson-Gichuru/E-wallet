@@ -13,9 +13,11 @@ class TestTaskSchedule(BaseTestConfig):
 
         self.user.add(self.user)
 
+    
     @mock.patch("app.models.Task", autospec=True)
     @mock.patch("app.models.current_app.queue", autospec=True)
-    def test_task_schedule(self, queue_mock, task_mock):
+    @mock.patch("app.models_events.update_balance_success", autospec=True)
+    def test_task_schedule(self,success_mock, queue_mock, task_mock):
 
         target_func = mock.Mock(lambda a, b: a * b)
 
@@ -25,6 +27,7 @@ class TestTaskSchedule(BaseTestConfig):
             owner=self.user,
             description=description,
             target_func=target_func,
+            on_success=success_mock,
             a=1,
             b=2
         )
@@ -34,6 +37,9 @@ class TestTaskSchedule(BaseTestConfig):
         queue_mock.enqueue.assert_called_with(
             target_func,
             description=description,
+            on_success=success_mock,
+            on_failure=None,
             a=1,
             b=2
         )
+

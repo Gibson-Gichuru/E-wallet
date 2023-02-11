@@ -35,7 +35,8 @@ class TestPayment(BaseTestConfig):
     
     @mock.patch("app.models_events.Task", autospec=True)
     @mock.patch("app.models_events.Account", autospec=True)
-    def test_update_account_balance(self, payment_mock, task_mock):
+    @mock.patch("app.models_events.update_balance_success", autospec=True)
+    def test_update_account_balance(self,on_suc_mock, payment_mock, task_mock):
 
         self.payment.add(self.payment)
 
@@ -43,6 +44,7 @@ class TestPayment(BaseTestConfig):
             owner=self.payment.account.holder,
             description="Account balance update",
             target_func=payment_mock.update_balance,
+            on_success=on_suc_mock,
             kwargs={
                 "amount":self.amount,
                 "account":self.payment.account

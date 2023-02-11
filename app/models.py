@@ -2,6 +2,7 @@ from app import db
 from datetime import datetime
 from flask import current_app
 
+
 class CrudOperations:
 
     def add(self, resource):
@@ -171,11 +172,15 @@ class Task(db.Model, CrudOperations):
         self.task_id = task_id
 
     @staticmethod
-    def schedule(owner, target_func=None, description=None, *args, **kwargs):
+    def schedule(owner,target_func=None, description=None, on_success=None,
+                  on_failure=None,
+                  *args, **kwargs):
 
         job = current_app.queue.enqueue(
             target_func,
             description=description,
+            on_success=on_success,
+            on_failure=on_failure,
             **kwargs
         )
 
