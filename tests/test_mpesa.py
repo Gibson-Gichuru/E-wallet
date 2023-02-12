@@ -183,12 +183,3 @@ class TestSTKCallBack(BaseTestConfig):
             self.user.username,
             payment.account.holder.username
         )
-
-        # assert the user account balance has been updated
-
-        self.assertEqual(
-            self.user.account.balance,
-            10
-        )
-
-        

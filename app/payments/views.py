@@ -35,10 +35,6 @@ class StkCallback(MethodView):
             amount=payment_info[0]["Value"]
         )
 
-        user.account.balance = payment_info[0]["Value"]
-
-        user.account.update()
-
         payment.add(payment)
 
         return jsonify({"message":"ok"})
