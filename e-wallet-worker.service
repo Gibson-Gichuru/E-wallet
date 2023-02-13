@@ -1,0 +1,14 @@
+[Unit]
+Description="E-wallet redis worker"
+After=network.target redis.service e-wallet.service
+Wants= redis.service e-wallet.service
+[Service]
+User=ubuntu
+Group=ubuntu
+RuntimeDirectory=e-wallet
+WorkingDirectory=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet
+Environment="PATH=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet/env/bin"
+ExecStart=/home/ubuntu/actions-runner/_work/E-wallet/env/bin/rq worker --with-scheduler -c /home/ubuntu/actions-runner/_work/E-wallet/settings
+ExecStop=/home/ubuntu/actions-runner/_work/E-wallet/env/bin/flask stop-redis-worker
+[Install]
+WantedBy=multi-user.target
