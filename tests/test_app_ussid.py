@@ -4,8 +4,7 @@ from tests.settings import Settings
 
 
 class TestUssidCallbackRoute(BaseTestConfig):
-
-            
+     
     def test_unregistered_user_option(self):
 
         """

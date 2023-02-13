@@ -2,6 +2,7 @@ from .models import Payment, Account, Task
 from sqlalchemy import event
 from .job_callbacks import update_balance_success
 
+
 @event.listens_for(Payment, "after_insert")
 def update_account_balance(mapper, connection, target):
 

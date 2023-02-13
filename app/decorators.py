@@ -1,6 +1,7 @@
 from app.models import Task
 import functools
 
+
 def update_task_state(func):
 
     @functools.wraps(func)

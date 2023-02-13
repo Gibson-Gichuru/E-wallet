@@ -5,6 +5,7 @@ from flask import current_app
 from datetime import datetime
 from app.mpesa import MpesaConsts
 
+
 class StkCallback(MethodView):
 
     def post(self):

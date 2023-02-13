@@ -3,6 +3,7 @@ import unittest
 from app import create_app, db
 from app.models import Status
 
+
 class BaseTestConfig(unittest.TestCase):
 
     def setUp(self) -> None:

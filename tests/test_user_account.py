@@ -1,9 +1,9 @@
 from tests import BaseTestConfig
-from app.models import User, Status, Actions
+from app.models import Actions
 from tests.settings import Settings
 
-class TestUser(BaseTestConfig):
 
+class TestUser(BaseTestConfig):
 
     def test_user_creation(self):
 
@@ -40,5 +40,3 @@ class TestUser(BaseTestConfig):
         self.assertTrue(user.account.can(Actions.NOACTION))
 
         self.assertFalse(user.account.can(Actions.TRANSACT))
-
-

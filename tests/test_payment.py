@@ -1,7 +1,7 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
 from unittest import mock
-from app.models import Payment, Account
+from app.models import Payment
 from datetime import datetime
 
 

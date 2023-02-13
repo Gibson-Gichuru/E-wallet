@@ -1,21 +1,21 @@
 import os
 import subprocess
 from config import base_dir
-from . import logger, E_WALLET_SERVICE
+from . import logging, E_WALLET_SERVICE
 
-def config_service():
 
-    if os.path.exists(os.path.join(E_WALLET_SERVICE, "e-wallet.service")):
+def config_service(service_file):
+
+    if os.path.exists(os.path.join(E_WALLET_SERVICE, service_file)):
 
         return
 
-    logger.info("Service Not found installing")
+    logging.info("Service Not found installing")
 
     command = "sudo cp {} {}".format(
-        os.path.join(base_dir,"e-wallet.service"),
-        os.path.join(E_WALLET_SERVICE, "e-wallet.service")
+        os.path.join(base_dir, service_file),
+        os.path.join(E_WALLET_SERVICE, service_file)
     )
-
 
     subprocess.run(command.split(),check=True)
 
@@ -24,7 +24,11 @@ def config_service():
     )
 
     subprocess.run(
-        "sudo systemctl enable e-wallet.service".split()
+        f"sudo systemctl start {service_file}".split()
+    )
+
+    subprocess.run(
+        f"sudo systemctl enable {service_file}".split()
     )
 
     return True

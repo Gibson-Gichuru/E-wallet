@@ -1,4 +1,4 @@
-import requests 
+import requests
 from requests.exceptions import RequestException
 from flask import current_app
 from enum import Enum
@@ -9,18 +9,18 @@ import base64
 
 class MpesaConsts(Enum):
 
-    AUTH_URL="/oauth/v1/generate?grant_type=client_credentials"
+    AUTH_URL = "/oauth/v1/generate?grant_type=client_credentials"
 
-    LNM_URL="/mpesa/stkpush/v1/processrequest"
+    LNM_URL = "/mpesa/stkpush/v1/processrequest"
 
-    TIMESTAMP_FORMAT="%Y%m%d%H%M%S"
+    TIMESTAMP_FORMAT = "%Y%m%d%H%M%S"
+
 
 class Mpesa:
 
     def __init__(self):
 
         self.stk_results = namedtuple("Results", "success")
-
 
     @staticmethod
     def encode(consumer_key, consumer_secret):
@@ -44,7 +44,7 @@ class Mpesa:
 
         encoded_string = base64.b64encode(full_string.encode("utf-8"))
 
-        return encoded_string 
+        return encoded_string
 
     def auth_tokens(self):
 
@@ -54,7 +54,7 @@ class Mpesa:
         )
 
         encoded_tokens = Mpesa.encode(
-            consumer_key= current_app.config.get("CONSUMER_KEY"),
+            consumer_key=current_app.config.get("CONSUMER_KEY"),
             consumer_secret=current_app.config.get("CONSUMER_SECRET")
         )
 
@@ -62,7 +62,7 @@ class Mpesa:
 
             tokens = requests.get(
                 auth_full_uri,
-                headers = {'Authorization': f'Bearer {encoded_tokens}'}
+                headers={'Authorization': f'Bearer {encoded_tokens}'}
             )
 
         except RequestException:
@@ -103,16 +103,16 @@ class Mpesa:
             "PhoneNumber": phonenumber,
             "CallBackURL": current_app.config.get("STK_CALLBACK"),
             "AccountReference": "E-wallet",
-            "TransactionDesc": "Account Deposit" 
+            "TransactionDesc": "Account Deposit"
         }
 
         try:
 
             response = requests.post(
                 stk_full_uri,
-                headers = headers,
-                data = payload
-            )  
+                headers=headers,
+                data=payload
+            )
 
         except RequestException:
 

@@ -2,7 +2,8 @@ import os
 import subprocess
 import sys
 from config import base_dir
-from . import logger
+from . import logging
+
 
 def install_updates():
 
@@ -10,7 +11,7 @@ def install_updates():
 
     if not os.path.exists(os.path.join(base_dir, "env")):
 
-        logger.info("Creating a virtual environment")
+        logging.info("Creating a virtual environment")
 
         subprocess.run(
             "python3 -m venv env".split(),
@@ -21,7 +22,7 @@ def install_updates():
 
     if not os.path.exists(os.path.join(base_dir, "requirements.txt")):
 
-        logger.error("Dependency file not found. Exiting")
+        logging.error("Dependency file not found. Exiting")
 
         sys.exit(1)
 
@@ -30,4 +31,4 @@ def install_updates():
         os.path.join(base_dir, "requirements.txt")
     )
 
-    subprocess.run(command.spit(), check=True, timeout=90)
+    subprocess.run(command.split(), check=True, timeout=90)

@@ -13,7 +13,6 @@ class TestTaskSchedule(BaseTestConfig):
 
         self.user.add(self.user)
 
-    
     @mock.patch("app.models.Task", autospec=True)
     @mock.patch("app.models.current_app.queue", autospec=True)
     @mock.patch("app.models_events.update_balance_success", autospec=True)
@@ -21,7 +20,7 @@ class TestTaskSchedule(BaseTestConfig):
 
         target_func = mock.Mock(lambda a, b: a * b)
 
-        description="testing"
+        description = "testing"
 
         Task.schedule(
             owner=self.user,
@@ -42,4 +41,3 @@ class TestTaskSchedule(BaseTestConfig):
             a=1,
             b=2
         )
-

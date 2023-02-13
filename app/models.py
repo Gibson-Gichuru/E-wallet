@@ -81,7 +81,6 @@ class Account(db.Model, CrudOperations):
 
     payments = db.relationship("Payment", backref="account", lazy="dynamic")
 
-
     def __init__(self) -> None:
         
         default_status = Status.query.filter_by(
@@ -101,14 +100,11 @@ class Account(db.Model, CrudOperations):
 
         if "account" in kwargs.keys():
 
-            account=kwargs.get("account")
+            account = kwargs.get("account")
 
-            amount=kwargs.get("amount", 0)
+            amount = kwargs.get("amount", 0)
 
             account.balance += amount
-
-
-
 
     def can(self, action):
 
@@ -140,7 +136,6 @@ class Payment(db.Model, CrudOperations):
         self.transaction_date = date
 
         self.amount = amount
-
         
     def __repr__(self) -> str:
         
@@ -172,9 +167,11 @@ class Task(db.Model, CrudOperations):
         self.task_id = task_id
 
     @staticmethod
-    def schedule(owner,target_func=None, description=None, on_success=None,
-                  on_failure=None,
-                  *args, **kwargs):
+    def schedule(
+        owner,target_func=None,
+        description=None, on_success=None,
+        on_failure=None,*args, **kwargs
+    ):
 
         job = current_app.queue.enqueue(
             target_func,
@@ -191,7 +188,6 @@ class Task(db.Model, CrudOperations):
         )
 
         new_task.add(new_task)
-
 
     def __repr__(self) -> str:
         
@@ -263,5 +259,3 @@ class Status(db.Model, CrudOperations):
                 )
 
                 new_status.add(new_status)
-
-

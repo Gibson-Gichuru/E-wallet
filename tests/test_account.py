@@ -2,6 +2,7 @@ from tests import BaseTestConfig
 from tests.settings import Settings
 from app.models import Account
 
+
 class TestAccount(BaseTestConfig):
 
     def setUp(self):

@@ -1,6 +1,7 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
 
+
 class TransactionTests(BaseTestConfig):
 
     def setUp(self) -> None:

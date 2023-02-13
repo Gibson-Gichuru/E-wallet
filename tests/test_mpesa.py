@@ -9,6 +9,7 @@ from collections import namedtuple
 import base64
 import json
 
+
 class TestMpesaAuth(BaseTestConfig):
 
     def setUp(self):
@@ -17,7 +18,7 @@ class TestMpesaAuth(BaseTestConfig):
 
         self.mpesa = Mpesa()
 
-    @mock.patch("app.mpesa.base64",autospec=True) 
+    @mock.patch("app.mpesa.base64",autospec=True)
     def test_consumer_tokens_encoding(self, b64_mock):
         
         consumer_key = "some key"
@@ -38,7 +39,6 @@ class TestMpesaAuth(BaseTestConfig):
 
         request_mock.get.assert_called()
 
-    
     @mock.patch("app.mpesa.requests", autospec=True)
     def test_auth_token_exception_raised(self, request_mock):
 
@@ -86,7 +86,6 @@ class TestMpesaSTK(BaseTestConfig):
             self.encoded_string.encode("utf-8")
         )
 
-      
     @mock.patch("app.mpesa.base64", autospec=True)
     @mock.patch("app.mpesa.datetime", autospec=True)
     def test_lmp_password_generator(self, datetime_mock, b64_mock):
@@ -127,7 +126,6 @@ class TestMpesaSTK(BaseTestConfig):
             "test"
         )
 
-
     @mock.patch("app.mpesa.requests")
     def test_mpesa_stk_push_fail(self, request_mock):
 
@@ -139,7 +137,7 @@ class TestMpesaSTK(BaseTestConfig):
         )
 
         self.assertEqual(
-            response, 
+            response,
             self.stk_results(False)
         )
 
@@ -172,7 +170,7 @@ class TestSTKCallBack(BaseTestConfig):
         # assert the payment was recorded
 
         payment = Payment.query.filter_by(
-            transaction_id= stk_data[-1]
+            transaction_id=stk_data[-1]
         ).first()
 
         self.assertIsNotNone(payment)

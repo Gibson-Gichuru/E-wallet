@@ -3,6 +3,7 @@ from unittest.mock import MagicMock
 from unittest import mock
 from app.job_callbacks import update_balance_success
 
+
 class TestJobCallbacks(BaseTestConfig):
 
     @mock.patch("app.decorators.Task")

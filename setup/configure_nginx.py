@@ -3,6 +3,7 @@ import subprocess
 from config import base_dir
 from . import NGINX_SYMLINK_DIR, NGINX_CONFIG_DIR
 
+
 def configure_nginx():
 
     # check if a simlink exists
@@ -11,18 +12,15 @@ def configure_nginx():
 
         return False
 
-    construct_command = "envsubst < {} > {}".format(
-        os.path.join(base_dir, "e-wallet.conf.template"),
-        os.path.join(base_dir,"e-wallett.conf")
-    )
+    script_dir = os.path.join(base_dir, "configure_nginx.sh")
 
     copy_command = "{} {} {}"
 
     # constuct nginx config file
 
-    subprocess.run(construct_command.split(),check=True)
+    subprocess.run(["bash", "-c", f"{script_dir}"], check=True)
 
-    # copy the nginx config file 
+    # copy the nginx config file
 
     subprocess.run(
         copy_command.format(
@@ -33,11 +31,11 @@ def configure_nginx():
         check=True
     )
 
-    # create a link 
+    # create a link
 
     subprocess.run(
         copy_command.format(
-            "sudo ln -sf", 
+            "sudo ln -sf",
             "/etc/nginx/sites-available/e-wallet",
             NGINX_SYMLINK_DIR
         ),

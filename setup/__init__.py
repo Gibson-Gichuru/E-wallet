@@ -1,6 +1,6 @@
 import logging
 
-logger = logging.basicConfig(
+logging.basicConfig(
     level=logging.DEBUG,
     format="[:] %(process)d - %(levelname)s - %(message)s"
 )
