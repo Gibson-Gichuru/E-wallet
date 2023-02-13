@@ -31,9 +31,14 @@ def uninstall_hooks():
 
     for file in files:
 
-        if os.path.islink(file):
+        path = os.path.join(base_dir, f".git/hooks/{file}")
 
-            os.unlink(file)
+        if os.path.islink(path):
+
+            os.unlink(path)
+
+            logging.info(f"Uninstalled {file[:-3]}")
+
 
 
 if __name__ == "__main__":
