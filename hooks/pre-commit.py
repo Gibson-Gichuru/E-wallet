@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 from config import base_dir
 import subprocess
-
+from setup import logging
 
 lint_command_one = f"flake8 {base_dir} " + \
 "--count --select E9,F63,F7,F82 " + \
@@ -14,6 +14,8 @@ lint_command_two = f"flake8 {base_dir} " + \
 "--exclude __pycache__,migrations,env,hooks --show-source --statistics" 
 
 def lint_code():
+
+    logging.info("Linting the source code..")
 
     subprocess.run(lint_command_one.split(), check=True)
 
