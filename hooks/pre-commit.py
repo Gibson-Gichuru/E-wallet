@@ -23,4 +23,4 @@ def lint_code():
 
 if __name__ == "__main__":
 
-    lint_code
+    lint_code()
