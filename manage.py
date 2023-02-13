@@ -61,3 +61,19 @@ def migrate_db():
     upgrade()
 
     Status.register_actions()
+
+
+@app.cli.command()
+def stop_redis_worker():
+
+    """Stop All Redis Workers"""
+
+    from flask import current_app
+    from rq.command import send_shutdown_command
+    from rq.worker import Worker
+
+    workers = Worker.all(current_app.redis)
+
+    for worker in workers:
+
+        send_shutdown_command(current_app.redis, worker.name)
