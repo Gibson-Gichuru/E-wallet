@@ -12,32 +12,41 @@ class TestTaskSchedule(BaseTestConfig):
         self.user = Settings.create_user(active=True)
 
         self.user.add(self.user)
+    
+    @mock.patch("app.models.Task", autospec=True)
+    @mock.patch("app.models.current_app.queue")
+    def test_task_schedule(self, queue_mock, task_mock):
 
-    @mock.patch("app.models.current_app.redis", autospec=True)
-    @mock.patch("app.models.current_app.queue", autospec=True)
-    @mock.patch("app.models_events.update_balance_success", autospec=True)
-    def test_task_schedule(self,success_mock, queue_mock, redis_mock):
-
-        target_func = mock.Mock(lambda a, b: a * b)
+        target = on_failure = mock.Mock(lambda a, b: a + b)
 
         description = "testing"
 
+        job_mock = mock.Mock()
+
+        job_mock.id.return_value = "some id"
+
+        queue_mock.enqueue.return_value = job_mock
+
         Task.schedule(
             owner=self.user,
+            target_func=target,
             description=description,
-            target_func=target_func,
-            on_success=success_mock,
+            on_failure=on_failure,
             a=1,
             b=2
         )
-
-        # assert that a job is scheduled
-
+       
         queue_mock.enqueue.assert_called_with(
-            target_func,
-            description=description,
-            on_success=success_mock,
-            on_failure=None,
-            a=1,
-            b=2
-        )
+           target,
+           description=description,
+           on_success=None,
+           on_failure=on_failure,
+           a=1,
+           b=2
+       )
+
+        task_mock.create_new.assert_called_with(
+           task_id=job_mock.id,
+           desc=description,
+           initiator=self.user
+       )

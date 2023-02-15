@@ -166,6 +166,19 @@ class Task(db.Model, CrudOperations):
 
         self.task_id = task_id
 
+    @classmethod
+    def create_new(cls, task_id, desc, initiator):
+
+        new_task = cls(
+            task_id=task_id,
+            desc=desc,
+            initiator=initiator
+        )
+
+        new_task.add(new_task)
+
+        return new_task
+
     @staticmethod
     def schedule(
         owner,target_func=None,
@@ -181,13 +194,11 @@ class Task(db.Model, CrudOperations):
             **kwargs
         )
 
-        new_task = Task(
+        Task.create_new(
             task_id=job.id,
             desc=description,
             initiator=owner
         )
-
-        new_task.add(new_task)
 
     def __repr__(self) -> str:
         
