@@ -1,10 +1,18 @@
 #!/usr/bin/env python3
-from config import base_dir
+import logging
 import subprocess
 import os
-from setup import logging
+
+
+logging.basicConfig(
+    level=logging.DEBUG,
+    format="[:] %(process)d - %(levelname)s - %(message)s"
+)
+
+base_dir = os.path.abspath(os.path.dirname("app"))
 
 test_command = "{} test"
+
 
 def run_tests():
 

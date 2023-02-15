@@ -1,29 +1,42 @@
 #!/usr/bin/env python3
 import os
+import stat
 from setup import logging
 from config import base_dir
 import argparse
+
 
 def install_hooks():
 
     files = os.listdir(os.path.join(base_dir, "hooks"))
 
+    file_permissions = (
+        stat.S_IRUSR |
+        stat.S_IWUSR |
+        stat.S_IXUSR |
+        stat.S_IRGRP |
+        stat.S_IWGRP |
+        stat.S_IXGRP
+    )
+
     for file in files:
 
-        if os.path.islink(os.path.join(base_dir, f".git/hooks/{file}")):
+        symlink_path = os.path.join(base_dir, f".git/hooks/{file[:-3]}")
+
+        file_path = os.path.join(base_dir, f"hooks/{file}")
+
+        if os.path.islink(symlink_path):
 
             logging.info(f"{file}: Hook aready installed")
 
             continue
         
-        os.chmod(os.path.join(base_dir, f"hooks/{file}"),770)
+        os.chmod(file_path,file_permissions)
 
-        os.symlink(
-            os.path.join(base_dir, f"hooks/{file}"),
-            os.path.join(base_dir, f".git/hooks/{file}")
-        )
+        os.symlink(file_path, symlink_path)
 
     logging.info("Hooks installed")
+
 
 def uninstall_hooks():
 
@@ -37,8 +50,7 @@ def uninstall_hooks():
 
             os.unlink(path)
 
-            logging.info(f"Uninstalled {file[:-3]}")
-
+            logging.info(f"Uninstalled {file}")
 
 
 if __name__ == "__main__":
@@ -62,4 +74,3 @@ if __name__ == "__main__":
     if args.uninstall:
 
         uninstall_hooks()
-
