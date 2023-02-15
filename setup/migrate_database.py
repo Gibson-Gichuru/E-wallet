@@ -16,13 +16,19 @@ def database_migrate():
         command.format(flask_dir, "current").split(),
         capture_output=True,
         encoding="utf-8"
-    ).stdout.split()[0]
+    ).stdout.split()
 
     migration_schema_version = subprocess.run(
         command.format(flask_dir, "heads").split(),
         capture_output=True,
         encoding="utf-8"
-    ).stdout.split()[0]
+    ).stdout.split()
+
+    if not current_version:
+
+        subprocess.run(
+            command.format(flask_dir, "upgrade").split()
+        )
 
     if current_version != migration_schema_version:
 
