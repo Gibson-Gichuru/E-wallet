@@ -35,7 +35,7 @@ def test():
 
     if not results.wasSuccessful():
 
-        sys.exit()
+        sys.exit(1)
 
 
 @app.shell_context_processor
