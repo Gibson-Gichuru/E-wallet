@@ -13,10 +13,10 @@ class TestTaskSchedule(BaseTestConfig):
 
         self.user.add(self.user)
 
-    @mock.patch("app.models.Task", autospec=True)
+    @mock.patch("app.models.current_app.redis", autospec=True)
     @mock.patch("app.models.current_app.queue", autospec=True)
     @mock.patch("app.models_events.update_balance_success", autospec=True)
-    def test_task_schedule(self,success_mock, queue_mock, task_mock):
+    def test_task_schedule(self,success_mock, queue_mock, redis_mock):
 
         target_func = mock.Mock(lambda a, b: a * b)
 
