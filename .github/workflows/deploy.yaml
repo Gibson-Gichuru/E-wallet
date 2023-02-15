@@ -61,6 +61,6 @@ jobs:
 
         run: |
 
-          sudo chmod +x configure_nginx.sh Setup.sh
+          sudo chmod +x configure_nginx.sh Setup.py
 
           ./Setup.py
