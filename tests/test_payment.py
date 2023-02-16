@@ -25,15 +25,6 @@ class TestPayment(BaseTestConfig):
         )
 
     @mock.patch("app.models_events.Task", autospec=True)
-    def test_notification(self, task_mock):
-
-        """User gets an SMS notification
-            once a payment is done
-        """
-
-        pass
-    
-    @mock.patch("app.models_events.Task", autospec=True)
     @mock.patch("app.models_events.Account", autospec=True)
     @mock.patch("app.models_events.update_balance_success", autospec=True)
     def test_update_account_balance(self,on_suc_mock, payment_mock, task_mock):

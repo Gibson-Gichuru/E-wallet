@@ -18,6 +18,8 @@ class Config:
 
     PASS_KEY = os.environ.get("PASS_KEY")
 
+    ACTIVATION_AMOUNT = os.environ.get("ACTIVATION_AMOUNT")
+
 
 class Development(Config):
 
@@ -25,6 +27,8 @@ class Development(Config):
         "sqlite:///" + os.path.join(base_dir, "dev-data.sqlite")
 
     MPESA_PHONENUMBER = os.environ.get("MPESA_PHONENUMBER")
+
+    ACTIVATION_AMOUNT = 1
 
     @staticmethod
     def init_app(app):
@@ -41,6 +45,8 @@ class Testing(Config):
 
     MPESA_PHONENUMBER = os.environ.get("MPESA_PHONENUMBER")
 
+    ACTIVATION_AMOUNT = 1
+    
     @staticmethod
     def init_app(app):
 
