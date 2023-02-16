@@ -110,3 +110,27 @@ class TransactionTests(BaseTestConfig):
             on_failure=failed_mock,
             user=self.user
         )
+
+    @mock.patch("app.ussid.views.Messanger", autospec=True)
+    @mock.patch("app.ussid.views.failed_notification", autospec=True)
+    @mock.patch("app.ussid.views.success_notification", autospec=True)
+    @mock.patch("app.ussid.views.Task", autospec=True)
+    def test_account_balance_task_schedule(
+        self,
+        task_mock,
+        success_mock,
+        failed_mock,
+        messanger_mock
+    ):
+
+        """Balance Task Schedule"""
+
+        self.transact("3")
+
+        task_mock.schedule.assert_called_with(
+            owner=self.user,
+            description="Account Balance",
+            target_func=messanger_mock.send_sms,
+            on_success=success_mock,
+            on_failure=failed_mock,
+        )

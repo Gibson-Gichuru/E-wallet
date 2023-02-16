@@ -11,6 +11,7 @@ from app.job_callbacks import (
 )
 
 from app.mpesa import Mpesa
+from app.message import Messanger
 
 
 class UssidCallback(MethodView):
@@ -71,6 +72,14 @@ class UssidCallback(MethodView):
     def process_level_1_menu_option_3(self, user):
 
         balance = float(user.account.balance)
+
+        Task.schedule(
+            owner=user,
+            description="Account Balance",
+            target_func=Messanger.send_sms,
+            on_success=success_notification,
+            on_failure=failed_notification
+        )
 
         return self.menu_text.get(
             "check_balance"
