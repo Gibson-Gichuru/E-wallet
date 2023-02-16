@@ -1,5 +1,6 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
+from unittest import mock
 
 
 class TransactionTests(BaseTestConfig):
@@ -58,4 +59,30 @@ class TransactionTests(BaseTestConfig):
             self.menu.get("check_balance") + "{}".format(
                 balance
             )
+        )
+
+    @mock.patch("app.ussid.views.Task", autospec=True)
+    @mock.patch("app.ussid.views.Mpesa", autospec=True)
+    @mock.patch("app.ussid.views.success_notification", autospec=True)
+    @mock.patch("app.ussid.views.failed_stk_push", autospec=True)
+    def test_top_up_stk_push(
+        self,
+        failed_stk_mock,
+        success_mock,
+        mpesa_mock,
+        task_mock
+    ):
+
+        """Top up request initiates an stk push task"""
+
+        self.transact(text="1*100")
+
+        task_mock.schedule.assert_called_with(
+            owner=self.user,
+            description="Topup Request",
+            target_func=mpesa_mock().stk_push,
+            on_success=success_mock,
+            on_failure=failed_stk_mock,
+            amount=100,
+            phonenumber=self.user.phonenumber
         )

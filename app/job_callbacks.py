@@ -11,3 +11,9 @@ def update_balance_success(job, connection, result, *args, **kwargs):
 def success_notification(job, connection, result, *args, **kwargs):
 
     pass
+
+
+@update_task_state
+def failed_stk_push(job, connection, result, *args, **kwargs):
+
+    pass

@@ -3,7 +3,13 @@ from flask import request
 from config import base_dir
 import os
 import json
-from app.models import User, Actions, Status
+from app.models import User, Actions, Status, Task
+from app.job_callbacks import (
+    success_notification,
+    failed_stk_push
+)
+
+from app.mpesa import Mpesa
 
 
 class UssidCallback(MethodView):
@@ -14,6 +20,8 @@ class UssidCallback(MethodView):
         with open(os.path.join(base_dir,"ussid_response.json"), "r") as file:
 
             self.menu_text = json.load(file)
+
+        self.mpesa = Mpesa()
 
     def process_input(self, text):
 
@@ -98,13 +106,23 @@ class UssidCallback(MethodView):
 
         return self.menu_text.get("reg_success")
 
-    def process_level_2_menu_option_1(self, user):
+    def process_level_2_menu_option_1(self, user, amount):
 
         # Todo topup process
 
+        Task.schedule(
+            owner=user,
+            description="Topup Request",
+            target_func=self.mpesa.stk_push,
+            on_success=success_notification,
+            on_failure=failed_stk_push,
+            amount=amount,
+            phonenumber=user.phonenumber
+        )
+
         return self.menu_text.get("topup_success")
 
-    def process_level_2_menu_option_2(self, user):
+    def process_level_2_menu_option_2(self, user, amount):
 
         # Todo withdraw process
 
@@ -164,9 +182,15 @@ class UssidCallback(MethodView):
 
                 if fine_text[-1][0] == "1":
 
-                    return self.process_level_2_menu_option_1(user)
+                    return self.process_level_2_menu_option_1(
+                        user=user,
+                        amount=int(fine_text[-1][-1])
+                    )
 
-                return self.process_level_2_menu_option_2(user)
+                return self.process_level_2_menu_option_2(
+                    user=user,
+                    amount=int(fine_text[-1][-1])
+                )
 
             return self.menu_text.get("cancel")
 
