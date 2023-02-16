@@ -61,6 +61,11 @@ class User(db.Model, CrudOperations):
 
         self.account  = Account()
 
+    @staticmethod
+    def generate_statement(user):
+
+        pass
+    
     def __repr__(self) -> str:
         return "User: {}".format(self.username)
 

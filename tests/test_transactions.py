@@ -1,6 +1,7 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
 from unittest import mock
+from app.models import User
 
 
 class TransactionTests(BaseTestConfig):
@@ -85,4 +86,27 @@ class TransactionTests(BaseTestConfig):
             on_failure=failed_stk_mock,
             amount=100,
             phonenumber=self.user.phonenumber
+        )
+    
+    @mock.patch("app.ussid.views.Task", autospec=True)
+    @mock.patch("app.ussid.views.success_notification", autospec=True)
+    @mock.patch("app.ussid.views.failed_notification", autospec=True)
+    def test_statement_task_schedule(
+        self,
+        failed_mock,
+        success_mock,
+        task_mock,
+    ):
+
+        """Statement Task Schedule"""
+
+        self.transact(text="4")
+
+        task_mock.schedule.assert_called_with(
+            owner=self.user,
+            description="Account Statement",
+            target_func=User.generate_statement,
+            on_success=success_mock,
+            on_failure=failed_mock,
+            user=self.user
         )

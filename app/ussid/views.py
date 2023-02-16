@@ -6,7 +6,8 @@ import json
 from app.models import User, Actions, Status, Task
 from app.job_callbacks import (
     success_notification,
-    failed_stk_push
+    failed_stk_push,
+    failed_notification
 )
 
 from app.mpesa import Mpesa
@@ -78,6 +79,15 @@ class UssidCallback(MethodView):
     def process_level_1_menu_option_4(self, user):
 
         # Todo implement statement processing
+
+        Task.schedule(
+            owner=user,
+            description="Account Statement",
+            target_func=User.generate_statement,
+            on_success=success_notification,
+            on_failure=failed_notification,
+            user=user
+        )
 
         return self.menu_text.get("statement")
 
