@@ -26,3 +26,9 @@ class BaseTestConfig(unittest.TestCase):
         self.app_context.pop()
 
         self.app = None
+
+    def run(self, result=None):
+
+        if not result.errors:
+
+            super(BaseTestConfig, self).run(result)
