@@ -16,17 +16,14 @@ class TestAccount(BaseTestConfig):
 
     def test_account_balance_update(self):
 
-        initial_balance = self.user.account.balance
-
-        Account.update_balance(
-            account=self.user.account,
+        account = Account.update_balance(
+            holder=self.user,
             amount=100
         )
         
-        self.assertGreater(
-            self.user.account.balance,
-            initial_balance,
-        )
+        self.assertIsNotNone(account)
+
+        self.assertEqual(account.balance, 100)
 
     @mock.patch("app.models_events.success_notification", autospec=True)
     @mock.patch("app.models_events.Messanger", autospec=True)
