@@ -4,3 +4,4 @@ __pycache__/
 design/
 .vscode/
 *.sqlite
+*.sqlite-*

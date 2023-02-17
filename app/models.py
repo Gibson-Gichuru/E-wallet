@@ -103,13 +103,19 @@ class Account(db.Model, CrudOperations):
     @staticmethod
     def update_balance(*args, **kwargs):
 
-        if "account" in kwargs.keys():
+        account = Account.query.filter_by(
+            holder=kwargs.get("holder")
+        ).first()
 
-            account = kwargs.get("account")
+        if account is None:
 
-            amount = kwargs.get("amount", 0)
+            return 
 
-            account.balance += amount
+        account.balance += kwargs.get("amount")
+
+        account.update()
+
+        return account
 
     def can(self, action):
 
