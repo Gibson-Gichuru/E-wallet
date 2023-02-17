@@ -109,7 +109,7 @@ class Account(db.Model, CrudOperations):
 
         if account is None:
 
-            return 
+            return
 
         account.balance += kwargs.get("amount")
 
