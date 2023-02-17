@@ -1,7 +1,6 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
 from app.mpesa import Mpesa, MpesaConsts
-from app.models import Payment
 from unittest import mock
 from requests.exceptions import RequestException
 from datetime import datetime
@@ -152,8 +151,10 @@ class TestSTKCallBack(BaseTestConfig):
 
         self.user.add(self.user)
 
+    @mock.patch("app.payments.views.datetime", autospec=True)
+    @mock.patch("app.payments.views.Payment", autospec=True)
     @mock.patch("app.payments.views.current_app.redis", autospec=True)
-    def test_stk_callback(self, redis_mock):
+    def test_stk_callback(self, redis_mock, payment_mock, date_mock):
 
         redis_mock.get.return_value = self.user.phonenumber.encode("utf-8")
 
@@ -161,23 +162,20 @@ class TestSTKCallBack(BaseTestConfig):
             phonenumber=self.user.phonenumber,
             amount=10
         )
+
+        date_mock.strptime.return_value = "test"
+
+        payment_info = stk_data[0]["Body"]["stkCallback"]["CallbackMetadata"]["Item"]
+
         self.client.post(
             Settings.STKCALLBACK,
             headers={"content-type": "application/json"},
             data=json.dumps(stk_data[0]),
         )
 
-        # assert the payment was recorded
-
-        payment = Payment.query.filter_by(
-            transaction_id=stk_data[-1]
-        ).first()
-
-        self.assertIsNotNone(payment)
-
-        # assert payment belongs to user account
-
-        self.assertEqual(
-            self.user.username,
-            payment.account.holder.username
+        payment_mock.assert_called_with(
+            transaction_id=payment_info[1]["Value"],
+            account=self.user.account,
+            date=date_mock.strptime(),
+            amount=payment_info[0]["Value"]
         )
