@@ -1,13 +1,9 @@
-from flask import current_app
-from .models import Payment, Account, Task, User
+from .models import Payment, Account, Task
 from sqlalchemy import event
 from .job_callbacks import (
     update_balance_success,
-    success_notification
 )
-# from app.mpesa import Mpesa
-from app.message import Messanger
-from app.mpesa import Mpesa
+
 
 @event.listens_for(Payment, "after_insert")
 def update_account_balance(mapper, connection, target):
@@ -35,7 +31,6 @@ def balance_notify(mapper, connection, target):
     # )
 
     pass
-
 
 # @event.listens_for(User, "after_insert")
 # def user_activation(mapper, connection, target):

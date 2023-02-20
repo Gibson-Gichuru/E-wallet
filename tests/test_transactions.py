@@ -1,6 +1,7 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
-from tests.task_setup import TaskTest
+from unittest import mock
+from app.models import User
 
 
 class TransactionTests(BaseTestConfig):
@@ -21,42 +22,67 @@ class TransactionTests(BaseTestConfig):
             data=Settings.make_request_body(text=text)
         )
 
-    def test_withdraw_complete_response(self):
+    @mock.patch("app.ussid.views.failed_stk_push", autospec=True)
+    @mock.patch("app.ussid.views.success_notification", autospec=True)
+    @mock.patch("app.ussid.views.Mpesa", autospec=True)
+    @mock.patch("app.ussid.views.Task", autospec=True)
+    def test_top_up(self, task_mock, mpesa_mock, success_mock, failed_mock):
 
-        response = self.transact("2*100")
+        """User top up option initiates stk push"""
+
+        response = self.transact(text="1*100")
+
+        task_mock.schedule.assert_called_with(
+
+            owner=self.user,
+            description="Topup Request",
+            target_func=mpesa_mock().stk_push,
+            on_success=success_mock,
+            on_failure=failed_mock,
+            amount=100,
+            phonenumber=self.user.phonenumber
+        )
 
         self.assertEqual(
             response.text,
-            self.menu.get("withdraw_success")
+            self.menu.get("topup_success")
         )
 
-    @TaskTest.task_wrapper(task_type="STATEMENT")
-    def test_request_statement_response(self):
+    @mock.patch("app.ussid.views.failed_notification", autospec=True)
+    @mock.patch("app.ussid.views.success_notification", autospec=True)
+    @mock.patch("app.ussid.views.Messanger", autospec=True)
+    @mock.patch("app.ussid.views.Task", autospec=True)
+    def test_balance(self, task_mock,msg_mock, success_mock, failed_mock):
 
-        response = self.transact(text="4")
+        """Balance request schedules a task"""
+
+        self.transact(text="3")
+
+        task_mock.schedule.assert_called_with(
+            owner=self.user,
+            description="Account Balance",
+            target_func=msg_mock.send_sms,
+            on_success=success_mock,
+            on_failure=failed_mock,
+        )
+
+    @mock.patch("app.ussid.views.failed_notification", autospec=True)
+    @mock.patch("app.ussid.views.success_notification", autospec=True)
+    @mock.patch("app.ussid.views.Task", autospec=True)
+    def test_statement_request(self, task_mock,success_mock, failed_mock):
+
+        response = self.transact("4")
+
+        task_mock.schedule.assert_called_with(
+            owner=self.user,
+            description="Account Statement",
+            target_func=User.generate_statement,
+            on_success=success_mock,
+            on_failure=failed_mock,
+            user=self.user
+        )
 
         self.assertEqual(
             response.text,
             self.menu.get("statement")
         )
-
-    @TaskTest.task_wrapper(task_type="BALANCE")
-    def test_check_balance(self):
-
-        balance = float(self.user.account.balance)
-
-        response = self.transact("3")
-
-        self.assertEqual(
-            response.text,
-            self.menu.get("check_balance") + "{}".format(
-                balance
-            )
-        )
-
-    @TaskTest.task_wrapper(task_type="TOPUP")
-    def test_top_up_stk_push(self):
-
-        """Top up request initiates an stk push task"""
-
-        self.transact(text="1*100")
