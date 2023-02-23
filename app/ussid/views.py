@@ -3,13 +3,7 @@ from flask import request
 from config import base_dir
 import os
 import json
-from app.models import User, Actions, Status, Task
-from app.job_callbacks import (
-    success_notification,
-    failed_stk_push,
-    failed_notification
-)
-
+from app.models import User, Actions, Task
 from app.mpesa import Mpesa
 from app.message import Messanger
 
@@ -77,8 +71,6 @@ class UssidCallback(MethodView):
             owner=user,
             description="Account Balance",
             target_func=Messanger.send_sms,
-            on_success=success_notification,
-            on_failure=failed_notification
         )
 
         return self.menu_text.get(
@@ -93,8 +85,6 @@ class UssidCallback(MethodView):
             owner=user,
             description="Account Statement",
             target_func=User.generate_statement,
-            on_success=success_notification,
-            on_failure=failed_notification,
             user=user
         )
 
@@ -102,13 +92,7 @@ class UssidCallback(MethodView):
 
     def process_level_1_menu_option_5(self, user):
 
-        new_status = Status.query.filter_by(
-            status_name="Deactivated"
-        ).first()
-
-        user.account.status = new_status
-
-        user.update()
+        user.account.deactivate()
 
         return self.menu_text.get("deactivate")
 
@@ -133,8 +117,6 @@ class UssidCallback(MethodView):
             owner=user,
             description="Topup Request",
             target_func=self.mpesa.stk_push,
-            on_success=success_notification,
-            on_failure=failed_stk_push,
             amount=amount,
             phonenumber=user.phonenumber
         )

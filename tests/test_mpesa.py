@@ -101,9 +101,10 @@ class TestMpesaSTK(BaseTestConfig):
 
         self.assertEqual(self.expected_pass, mpesa_password)
 
-    @mock.patch("app.mpesa.current_app.redis")
     @mock.patch("app.mpesa.requests", autospec=True)
-    def test_mpesa_stk_push_success(self, request_mock, redis_mock):
+    def test_mpesa_stk_push_success(self, request_mock):
+
+        redis_mock = mock.Mock(self.app.redis)
 
         stk_ack_data = Settings.stk_push_ack()
 
@@ -111,7 +112,8 @@ class TestMpesaSTK(BaseTestConfig):
 
         results = self.mpesa.stk_push(
             amount=10,
-            phonenumber="test"
+            phonenumber="test",
+            redis_obj=redis_mock
         )
 
         self.assertEqual(

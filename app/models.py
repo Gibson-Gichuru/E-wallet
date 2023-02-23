@@ -1,6 +1,8 @@
 from app import db
 from datetime import datetime
 from flask import current_app
+from sqlalchemy import event
+from app.message import Messanger
 
 
 class CrudOperations:
@@ -65,7 +67,7 @@ class User(db.Model, CrudOperations):
     def generate_statement(user):
 
         pass
-    
+
     def __repr__(self) -> str:
         return "User: {}".format(self.username)
 
@@ -117,11 +119,39 @@ class Account(db.Model, CrudOperations):
 
         return account
 
+    @staticmethod
+    def balance_notify(target, value, oldvalue, initiator):
+
+        Task.schedule(
+            owner=target.holder,
+            description="Balance Notification",
+            target_func=Messanger.send_sms,
+        )
+
+    @staticmethod
+    def status_report_notify(target, value, oldvalue, initiator):
+
+        Task.schedule(
+            owner=target.holder,
+            description="Account Status Change",
+            target_func=Messanger.send_sms
+        )
+
     def can(self, action):
 
         return self.status is not None and (
             action & self.status.actions
         ) == action
+
+    def deactivate(self):
+
+        status = Status.query.filter_by(
+            status_name="Deactivated"
+        ).first()
+
+        self.status = status
+
+        self.update()
 
 
 class Payment(db.Model, CrudOperations):
@@ -147,6 +177,17 @@ class Payment(db.Model, CrudOperations):
         self.transaction_date = date
 
         self.amount = amount
+
+    @staticmethod
+    def register_to_account(mapper, conn, target):
+
+        Task.schedule(
+            owner=target.account.holder,
+            description="Account Balance update",
+            target_func=Account.update_balance,
+            amount=target.amount,
+            holder=target.account.holder
+        )
         
     def __repr__(self) -> str:
         
@@ -191,17 +232,28 @@ class Task(db.Model, CrudOperations):
         return new_task
 
     @staticmethod
+    def update_task_status(job, connection, result, *args, **kwargs):
+
+        task = Task.query.filter_by(
+            task_id=job.id
+        ).first()
+
+        task.completed = True
+
+    @staticmethod
     def schedule(
         owner,target_func=None,
-        description=None, on_success=None,
-        on_failure=None,*args, **kwargs
+        description=None,
+        on_success=None,
+        on_failure=None,
+        *args, **kwargs
     ):
 
         job = current_app.queue.enqueue(
             target_func,
             description=description,
-            on_success=on_success,
-            on_failure=on_failure,
+            on_success=on_success if on_success else Task.update_task_status,
+            on_failure=on_failure if on_failure else Task.update_task_status,
             **kwargs
         )
 
@@ -281,3 +333,10 @@ class Status(db.Model, CrudOperations):
                 )
 
                 new_status.add(new_status)
+
+
+# ORM EVENTS REGISTRATION
+
+event.listen(Account.balance, "set", Account.balance_notify)
+# event.listen(Account.status, "set", Account.status_report_notify)
+event.listen(Payment, "after_insert", Payment.register_to_account)

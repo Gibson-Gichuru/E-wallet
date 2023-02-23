@@ -1,10 +1,10 @@
 import requests
 from requests.exceptions import RequestException
-from flask import current_app
 from enum import Enum
 from datetime import datetime
 from collections import namedtuple
 import base64
+import os
 
 
 class MpesaConsts(Enum):
@@ -37,8 +37,8 @@ class Mpesa:
         )
 
         full_string = "{}{}{}".format(
-            current_app.config.get("BUSINESS_SHORT_CODE"),
-            current_app.config.get("PASS_KEY"),
+            os.environ.get("BUSINESS_SHORT_CODE"),
+            os.environ.get("PASS_KEY"),
             timestamp
         )
 
@@ -49,13 +49,13 @@ class Mpesa:
     def auth_tokens(self):
 
         auth_full_uri = "{}{}".format(
-            current_app.config.get("MPESA_BASE_URL"),
+            os.environ.get("MPESA_BASE_URL"),
             MpesaConsts.AUTH_URL.value
         )
 
         encoded_tokens = Mpesa.encode(
-            consumer_key=current_app.config.get("CONSUMER_KEY"),
-            consumer_secret=current_app.config.get("CONSUMER_SECRET")
+            consumer_key=os.environ.get("CONSUMER_KEY"),
+            consumer_secret=os.environ.get("CONSUMER_SECRET")
         )
 
         try:
@@ -71,18 +71,21 @@ class Mpesa:
 
         return tokens
     
-    def stk_push(self, amount, phonenumber):
+    @staticmethod
+    def stk_push(amount, phonenumber, redis_obj=None):
+
+        mpesa = Mpesa()
 
         password = Mpesa.lipa_na_mpesa_pass()
 
-        tokens = self.auth_tokens()
+        tokens = mpesa.auth_tokens()
 
         timestamp = datetime.now().strftime(
             MpesaConsts.TIMESTAMP_FORMAT.value
         )
 
         stk_full_uri = "{}{}".format(
-            current_app.config.get("MPESA_BASE_URL"),
+            os.environ.get("MPESA_BASE_URL"),
             MpesaConsts.LNM_URL.value
         )
 
@@ -99,9 +102,9 @@ class Mpesa:
             "TransactionType": "CustomerPayBillOnline",
             "Amount": amount,
             "PartyA": phonenumber,
-            "PartyB": current_app.config.get("BUSINESS_SHORT_CODE"),
+            "PartyB": os.environ.get("BUSINESS_SHORT_CODE"),
             "PhoneNumber": phonenumber,
-            "CallBackURL": current_app.config.get("STK_CALLBACK"),
+            "CallBackURL": os.environ.get("STK_CALLBACK"),
             "AccountReference": "E-wallet",
             "TransactionDesc": "Account Deposit"
         }
@@ -116,11 +119,11 @@ class Mpesa:
 
         except RequestException:
 
-            return self.stk_results(False)
+            return mpesa.stk_results(False)
 
-        current_app.redis.set(
+        redis_obj.set(
                 response.get("CheckoutRequestID"),
                 phonenumber
             )
 
-        return self.stk_results(True)
+        return mpesa.stk_results(True)

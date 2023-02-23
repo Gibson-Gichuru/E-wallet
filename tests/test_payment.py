@@ -3,6 +3,7 @@ from tests.settings import Settings
 from unittest import mock
 from app.models import Payment
 from datetime import datetime
+from app.models import Account
 
 
 class TestPayment(BaseTestConfig):
@@ -24,18 +25,15 @@ class TestPayment(BaseTestConfig):
             amount=self.amount
         )
 
-    @mock.patch("app.models_events.Task", autospec=True)
-    @mock.patch("app.models_events.Account", autospec=True)
-    @mock.patch("app.models_events.update_balance_success", autospec=True)
-    def test_update_account_balance(self,on_suc_mock, payment_mock, task_mock):
+    @mock.patch("app.models.Task.schedule", autospec=True)
+    def test_update_account_balance(self, task_mock):
 
         self.payment.add(self.payment)
 
-        task_mock.schedule.assert_called_with(
+        task_mock.assert_called_with(
             owner=self.payment.account.holder,
-            description="Account balance update",
-            target_func=payment_mock.update_balance,
-            on_success=on_suc_mock,
+            description="Account Balance update",
+            target_func=Account.update_balance,
             amount=self.amount,
-            account=self.payment.account
+            holder=self.payment.account.holder
         )

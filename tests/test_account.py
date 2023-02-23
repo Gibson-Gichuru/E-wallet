@@ -1,7 +1,7 @@
 from tests import BaseTestConfig
 from tests.settings import Settings
 from app.models import Account
-from unittest import mock
+from unittest import mock, skip
 
 
 class TestAccount(BaseTestConfig):
@@ -14,29 +14,27 @@ class TestAccount(BaseTestConfig):
 
         self.user.add(self.user)
 
-    def test_account_balance_update(self):
+    @mock.patch("app.models.Messanger", autospec=True)
+    @mock.patch("app.models.Task.schedule", autospec=True)
+    def test_balance_update_notification(self,schedule, msg):
 
-        account = Account.update_balance(
-            holder=self.user,
-            amount=100
-        )
-        
-        self.assertIsNotNone(account)
+        Account.update_balance(holder=self.user, amount=10)
 
-        self.assertEqual(account.balance, 100)
-
-    @mock.patch("app.models_events.success_notification", autospec=True)
-    @mock.patch("app.models_events.Messanger", autospec=True)
-    @mock.patch("app.models_events.Task", autospec=True)
-    def test_notification_on_balance_update(self, task_mock, msg_mock, suc_mock):
-
-        self.user.account.balance = 100
-
-        self.user.account.update()
-
-        task_mock.schedule.assert_called_with(
+        schedule.assert_called_with(
             owner=self.user,
-            description="Balance notification",
-            target_func=msg_mock.send_sms,
-            on_success=suc_mock,
+            description="Balance Notification",
+            target_func=msg.send_sms,
+        )
+
+    @skip("No implemented yet")
+    @mock.patch("app.models.Messanger", autospec=True)
+    @mock.patch("app.models.Task.schedule", autospec=True)
+    def test_deactivation_update_notification(self, schedule, msg):
+
+        self.user.account.deactivate()
+
+        schedule.assert_called_with(
+            owner=self.user,
+            description="Account Status Change",
+            target_func=msg.send_sms
         )

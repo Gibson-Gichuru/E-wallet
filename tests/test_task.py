@@ -17,7 +17,7 @@ class TestTaskSchedule(BaseTestConfig):
     @mock.patch("app.models.current_app.queue")
     def test_task_schedule(self, queue_mock, task_mock):
 
-        target = on_failure = mock.Mock(lambda a, b: a + b)
+        target = mock.Mock(lambda a, b: a + b)
 
         description = "testing"
 
@@ -31,7 +31,6 @@ class TestTaskSchedule(BaseTestConfig):
             owner=self.user,
             target_func=target,
             description=description,
-            on_failure=on_failure,
             a=1,
             b=2
         )
@@ -39,8 +38,8 @@ class TestTaskSchedule(BaseTestConfig):
         queue_mock.enqueue.assert_called_with(
            target,
            description=description,
-           on_success=None,
-           on_failure=on_failure,
+           on_success=task_mock.update_task_status,
+           on_failure=task_mock.update_task_status,
            a=1,
            b=2
        )

@@ -22,11 +22,9 @@ class TransactionTests(BaseTestConfig):
             data=Settings.make_request_body(text=text)
         )
 
-    @mock.patch("app.ussid.views.failed_stk_push", autospec=True)
-    @mock.patch("app.ussid.views.success_notification", autospec=True)
     @mock.patch("app.ussid.views.Mpesa", autospec=True)
     @mock.patch("app.ussid.views.Task", autospec=True)
-    def test_top_up(self, task_mock, mpesa_mock, success_mock, failed_mock):
+    def test_top_up(self, task_mock, mpesa_mock):
 
         """User top up option initiates stk push"""
 
@@ -37,8 +35,6 @@ class TransactionTests(BaseTestConfig):
             owner=self.user,
             description="Topup Request",
             target_func=mpesa_mock().stk_push,
-            on_success=success_mock,
-            on_failure=failed_mock,
             amount=100,
             phonenumber=self.user.phonenumber
         )
@@ -48,11 +44,9 @@ class TransactionTests(BaseTestConfig):
             self.menu.get("topup_success")
         )
 
-    @mock.patch("app.ussid.views.failed_notification", autospec=True)
-    @mock.patch("app.ussid.views.success_notification", autospec=True)
     @mock.patch("app.ussid.views.Messanger", autospec=True)
     @mock.patch("app.ussid.views.Task", autospec=True)
-    def test_balance(self, task_mock,msg_mock, success_mock, failed_mock):
+    def test_balance(self, task_mock,msg_mock):
 
         """Balance request schedules a task"""
 
@@ -62,14 +56,10 @@ class TransactionTests(BaseTestConfig):
             owner=self.user,
             description="Account Balance",
             target_func=msg_mock.send_sms,
-            on_success=success_mock,
-            on_failure=failed_mock,
         )
 
-    @mock.patch("app.ussid.views.failed_notification", autospec=True)
-    @mock.patch("app.ussid.views.success_notification", autospec=True)
     @mock.patch("app.ussid.views.Task", autospec=True)
-    def test_statement_request(self, task_mock,success_mock, failed_mock):
+    def test_statement_request(self, task_mock):
 
         response = self.transact("4")
 
@@ -77,8 +67,6 @@ class TransactionTests(BaseTestConfig):
             owner=self.user,
             description="Account Statement",
             target_func=User.generate_statement,
-            on_success=success_mock,
-            on_failure=failed_mock,
             user=self.user
         )
 
