@@ -44,7 +44,7 @@ class TransactionTests(BaseTestConfig):
             self.menu.get("topup_success")
         )
 
-    @mock.patch("app.ussid.views.Messanger", autospec=True)
+    @mock.patch("app.ussid.views.send_sms", autospec=True)
     @mock.patch("app.ussid.views.Task", autospec=True)
     def test_balance(self, task_mock,msg_mock):
 
@@ -55,7 +55,7 @@ class TransactionTests(BaseTestConfig):
         task_mock.schedule.assert_called_with(
             owner=self.user,
             description="Account Balance",
-            target_func=msg_mock.send_sms,
+            target_func=msg_mock,
         )
 
     @mock.patch("app.ussid.views.Task", autospec=True)

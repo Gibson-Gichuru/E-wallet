@@ -1,6 +1,3 @@
-class Messanger:
+def send_sms(*args, **kwargs):
 
-    @staticmethod
-    def send_sms(*args, **kwargs):
-
-        pass
+    pass

@@ -5,7 +5,7 @@ import os
 import json
 from app.models import User, Actions, Task
 from app.mpesa import Mpesa
-from app.message import Messanger
+from app.message import send_sms
 
 
 class UssidCallback(MethodView):
@@ -70,7 +70,7 @@ class UssidCallback(MethodView):
         Task.schedule(
             owner=user,
             description="Account Balance",
-            target_func=Messanger.send_sms,
+            target_func=send_sms,
         )
 
         return self.menu_text.get(

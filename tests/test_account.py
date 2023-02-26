@@ -14,7 +14,7 @@ class TestAccount(BaseTestConfig):
 
         self.user.add(self.user)
 
-    @mock.patch("app.models.Messanger", autospec=True)
+    @mock.patch("app.models.send_sms", autospec=True)
     @mock.patch("app.models.Task.schedule", autospec=True)
     def test_balance_update_notification(self,schedule, msg):
 
@@ -23,11 +23,12 @@ class TestAccount(BaseTestConfig):
         schedule.assert_called_with(
             owner=self.user,
             description="Balance Notification",
-            target_func=msg.send_sms,
+            target_func=msg,
+            queue=self.app.queue
         )
 
     @skip("No implemented yet")
-    @mock.patch("app.models.Messanger", autospec=True)
+    @mock.patch("app.models.send_sms", autospec=True)
     @mock.patch("app.models.Task.schedule", autospec=True)
     def test_deactivation_update_notification(self, schedule, msg):
 
@@ -36,5 +37,5 @@ class TestAccount(BaseTestConfig):
         schedule.assert_called_with(
             owner=self.user,
             description="Account Status Change",
-            target_func=msg.send_sms
+            target_func=msg
         )

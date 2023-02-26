@@ -1,8 +1,6 @@
 from app import db
 from datetime import datetime
-from flask import current_app
-from sqlalchemy import event
-from app.message import Messanger
+from app.message import send_sms
 
 
 class CrudOperations:
@@ -134,7 +132,7 @@ class Account(db.Model, CrudOperations):
         Task.schedule(
             owner=target.holder,
             description="Account Status Change",
-            target_func=Messanger.send_sms
+            target_func=send_sms
         )
 
     def can(self, action):
