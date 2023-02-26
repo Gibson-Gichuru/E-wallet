@@ -1,5 +1,5 @@
 import os
-
+from sqlalchemy import event
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -20,6 +20,32 @@ class Config:
 
     ACTIVATION_AMOUNT = os.environ.get("ACTIVATION_AMOUNT")
 
+    @staticmethod
+    def init_app(app):
+
+        from app.models import Account, Payment
+
+        def inject_app_obj(func):
+
+            setattr(
+                func,
+                "_current_app",
+                app
+            )
+
+            return func
+
+        event.listen(
+            Account.balance,
+            "set",
+            inject_app_obj(Account.balance_notify)
+        )
+        event.listen(
+            Payment,
+            "after_insert",
+            inject_app_obj(Payment.register_to_account)
+        )
+
 
 class Development(Config):
 
@@ -33,7 +59,7 @@ class Development(Config):
     @staticmethod
     def init_app(app):
 
-        pass
+        Config.init_app(app=app)
 
 
 class Testing(Config):
@@ -50,7 +76,7 @@ class Testing(Config):
     @staticmethod
     def init_app(app):
 
-        pass
+        Config.init_app(app=app)
 
 
 class Production(Config):
@@ -58,7 +84,7 @@ class Production(Config):
     @staticmethod
     def init__app(app):
 
-        pass
+        Config.init_app(app=app)
 
 
 config = {

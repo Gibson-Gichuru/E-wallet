@@ -14,8 +14,9 @@ class TestTaskSchedule(BaseTestConfig):
         self.user.add(self.user)
     
     @mock.patch("app.models.Task", autospec=True)
-    @mock.patch("app.models.current_app.queue")
-    def test_task_schedule(self, queue_mock, task_mock):
+    def test_task_schedule(self,task_mock):
+
+        queue_mock = mock.MagicMock(self.app.queue)
 
         target = mock.Mock(lambda a, b: a + b)
 
@@ -31,6 +32,7 @@ class TestTaskSchedule(BaseTestConfig):
             owner=self.user,
             target_func=target,
             description=description,
+            queue=queue_mock,
             a=1,
             b=2
         )

@@ -120,11 +120,16 @@ class Account(db.Model, CrudOperations):
     @staticmethod
     def balance_notify(target, value, oldvalue, initiator):
 
-        Task.schedule(
-            owner=target.holder,
-            description="Balance Notification",
-            target_func=Messanger.send_sms,
-        )
+        app = getattr(Account.balance_notify, "_current_app")
+
+        with app.app_context():
+
+            Task.schedule(
+                owner=target.holder,
+                description="Balance Notification",
+                target_func=send_sms,
+                queue=app.queue
+            )
 
     @staticmethod
     def status_report_notify(target, value, oldvalue, initiator):
@@ -238,16 +243,20 @@ class Task(db.Model, CrudOperations):
 
         task.completed = True
 
+        task.update()
+
     @staticmethod
     def schedule(
-        owner,target_func=None,
+        owner,
+        target_func=None,
         description=None,
         on_success=None,
         on_failure=None,
+        queue=None,
         *args, **kwargs
     ):
 
-        job = current_app.queue.enqueue(
+        job = queue.enqueue(
             target_func,
             description=description,
             on_success=on_success if on_success else Task.update_task_status,
@@ -331,10 +340,3 @@ class Status(db.Model, CrudOperations):
                 )
 
                 new_status.add(new_status)
-
-
-# ORM EVENTS REGISTRATION
-
-event.listen(Account.balance, "set", Account.balance_notify)
-# event.listen(Account.status, "set", Account.status_report_notify)
-event.listen(Payment, "after_insert", Payment.register_to_account)
