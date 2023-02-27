@@ -55,6 +55,15 @@ class Settings:
         return menu
 
     @staticmethod
+    def get_sms_templates():
+
+        with open(os.path.join(base_dir, "sms_template.json"), "r") as file:
+
+            templates = json.load(file)
+
+        return templates
+
+    @staticmethod
     def stk_push_ack(success=True):
 
         response = {
