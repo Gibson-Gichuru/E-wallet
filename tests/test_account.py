@@ -18,7 +18,11 @@ class TestAccount(BaseTestConfig):
     @mock.patch("app.models.Task.schedule", autospec=True)
     def test_balance_update_notification(self,schedule, msg):
 
-        Account.update_balance(holder=self.user, amount=10)
+        Account.update_balance(
+            transaction_type="credit",
+            holder=self.user,
+            amount=10
+        )
 
         schedule.assert_called_with(
             owner=self.user,
