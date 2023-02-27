@@ -66,8 +66,9 @@ class TransactionTests(BaseTestConfig):
         task_mock.schedule.assert_called_with(
             owner=self.user,
             description="Account Statement",
-            target_func=User.generate_statement,
+            target_func=User.account_statement,
             user=self.user
+
         )
 
         self.assertEqual(

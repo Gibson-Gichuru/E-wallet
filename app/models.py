@@ -62,9 +62,24 @@ class User(db.Model, CrudOperations):
         self.account  = Account()
 
     @staticmethod
-    def generate_statement(user):
+    def account_statement(user):
 
-        pass
+        sms_format = Account.sms_statement_format()
+
+        recipient = "+" + user.phonenumber
+
+        data = {
+            "date":datetime.utcnow(),
+            "records_str":sms_format,
+            "cumulative_debit":user.account.cumulative_debit,
+            "cumulative_credit":user.account.cumulative_credit,
+            "balance":user.account.balance
+        }
+        send_sms(
+            template="STATEMENT",
+            recipients=(recipient,),
+            data=data
+        )
 
     def __repr__(self) -> str:
         return "User: {}".format(self.username)
@@ -80,6 +95,10 @@ class Account(db.Model, CrudOperations):
 
     balance = db.Column(db.Numeric(5,2), default=0.0)
 
+    cumulative_debit = db.Column(db.Numeric(5,2), default=0.0)
+
+    cumulative_credit = db.Column(db.Numeric(5,2), default=0.0)
+
     holder_id = db.Column(db.Integer, db.ForeignKey('user.user_id'))
 
     holder = db.relationship("User", uselist=False, back_populates="account")
@@ -94,6 +113,33 @@ class Account(db.Model, CrudOperations):
 
         self.status = default_status
 
+    def generate_statement(self):
+
+        records = self.payments.all()
+
+        return [
+            dict(
+                ref_no=record.transaction_id,
+                amount=record.amount,
+                date=datetime.strftime(
+                    record.transaction_date,
+                    "%Y-%m-%d %H:%M:%S"
+                )
+            )
+            for record in records
+        ]
+
+    @staticmethod
+    def sms_statement_format(records):
+
+        record_str = ""
+
+        for record in records:
+
+            record_str += f"{record.get('ref_no')} {record.get('amount')} {record.get('date')}"
+
+        return record_str
+
     def __repr__(self) -> str:
         
         return "Account Holder: {}".format(
@@ -101,7 +147,7 @@ class Account(db.Model, CrudOperations):
         )
 
     @staticmethod
-    def update_balance(*args, **kwargs):
+    def update_balance(transaction_type, **kwargs):
 
         account = Account.query.filter_by(
             holder=kwargs.get("holder")
@@ -111,7 +157,17 @@ class Account(db.Model, CrudOperations):
 
             return
 
-        account.balance += kwargs.get("amount")
+        if transaction_type.upper() == "CREDIT":
+
+            account.balance += kwargs.get("amount")
+
+            account.cumulative_credit += kwargs.get("amount")
+
+        if transaction_type.upper() == "DEBIT" and account.balance > 0:
+
+            account.balance -= kwargs.get("amount")
+
+            account.cumulative_debit += kwargs.get("amount")
 
         account.update()
 

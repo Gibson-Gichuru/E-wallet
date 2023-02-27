@@ -84,7 +84,7 @@ class UssidCallback(MethodView):
         Task.schedule(
             owner=user,
             description="Account Statement",
-            target_func=User.generate_statement,
+            target_func=User.account_statement,
             user=user
         )
 

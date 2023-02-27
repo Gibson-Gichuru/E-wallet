@@ -102,7 +102,7 @@ class TestSMSTemplates(BaseTestConfig):
         data = dict(
             date="test",
             records_str=string_rep,
-            cumulative_total=20,
+            cumulative_debit=20,
             balance=2
         )
 
@@ -111,7 +111,7 @@ class TestSMSTemplates(BaseTestConfig):
         expected_template = lambda template, data: template.format(
             data.get("date"),
             data.get("records_str"),
-            data.get("cumulative_total"),
+            data.get("cumulative_debit"),
             data.get("balance")
         )
 
