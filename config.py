@@ -1,5 +1,5 @@
 import os
-from sqlalchemy import event
+
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
 
@@ -24,6 +24,8 @@ class Config:
     def init_app(app):
 
         from app.models import Account, Payment
+
+        from sqlalchemy import event
 
         def inject_app_obj(func):
 

@@ -5,3 +5,4 @@ design/
 .vscode/
 *.sqlite
 *.sqlite-*
+*.conf
