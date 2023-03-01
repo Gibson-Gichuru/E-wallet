@@ -3,11 +3,16 @@ import africastalking
 import json
 from config import base_dir
 
+try:
 
-africastalking.initialize(
-    username=os.environ.get("TALKING_USERNAME"),
-    api_key=os.environ.get("TALKING_API_KEY")
-)
+    africastalking.initialize(
+        username=os.environ.get("TALKING_USERNAME"),
+        api_key=os.environ.get("TALKING_API_KEY")
+    )
+
+except Exception as error:
+
+    pass
 
 SMS = africastalking.SMS
 
@@ -82,10 +87,10 @@ def send_sms(tempate, recipients=(),**kwargs):
 
     sender = os.environ.get("TALKING_SHORT_CODE")
 
-    sms = template_constructor(tempate,kwargs.get("data"))
+    sms_message = template_constructor(tempate,kwargs.get("data"))
 
-    if not sms:
+    if not sms_message or not SMS:
 
         return
 
-    SMS.send(sms,list(recipients),sender)
+    SMS.send(sms_message,list(recipients),sender)
