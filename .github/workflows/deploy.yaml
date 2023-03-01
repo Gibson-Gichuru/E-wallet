@@ -10,6 +10,14 @@ on:
 
 jobs:
 
+  env:
+
+    TALKING_API_KEY: {{secrets.TALKING_API_KEY}}
+
+    TALKING_USERNAME: {{secrets.TALKING_USERNAME}}
+    
+    TALKING_SHORT_CODE: {{secrets.TALKING_SHORT_CODE}}
+
   Testing:
 
     runs-on: ubuntu-latest
