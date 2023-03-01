@@ -11,12 +11,16 @@ class TestTaskSchedule(BaseTestConfig):
 
         self.user = Settings.create_user(active=True)
 
+        # self.app.redis = mock.Mock()
+
+        self.app.queue = mock.Mock()
+
         self.user.add(self.user)
     
     @mock.patch("app.models.Task", autospec=True)
     def test_task_schedule(self,task_mock):
 
-        queue_mock = mock.MagicMock(self.app.queue)
+        # queue_mock = mock.MagicMock(self.app.queue)
 
         target = mock.Mock(lambda a, b: a + b)
 
@@ -26,18 +30,18 @@ class TestTaskSchedule(BaseTestConfig):
 
         job_mock.id.return_value = "some id"
 
-        queue_mock.enqueue.return_value = job_mock
+        self.app.queue.enqueue.return_value = job_mock
 
         Task.schedule(
             owner=self.user,
             target_func=target,
             description=description,
-            queue=queue_mock,
+            queue=self.app.queue,
             a=1,
             b=2
         )
        
-        queue_mock.enqueue.assert_called_with(
+        self.app.queue.enqueue.assert_called_with(
            target,
            description=description,
            on_success=task_mock.update_task_status,
