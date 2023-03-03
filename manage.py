@@ -77,3 +77,79 @@ def stop_redis_worker():
     for worker in workers:
 
         send_shutdown_command(current_app.redis, worker.name)
+
+
+@app.cli.command()
+def tunnel():
+
+    """Tunnel the application for callback testing"""
+
+    from pyngrok import ngrok
+    import logging
+    from tempfile import mkstemp
+    from shutil import move, copymode
+    from os import fdopen, remove
+
+    def update_env(file_path, pattern, replacement):
+
+        temp_file, abs_path = mkstemp()
+
+        with fdopen(temp_file, "w") as new_file:
+
+            with open(file_path) as old_file:
+
+                for line in old_file:
+
+                    new_file.write(line.replace(pattern, replacement))
+
+        copymode(file_path, abs_path)
+        remove(file_path)
+        move(abs_path,file_path)
+
+    logging.basicConfig(level=logging.ERROR)
+
+    try:
+
+        print("starting the tunnel")
+
+        https_tunnel = ngrok.connect(5000, "http", bind_tls=True)
+
+        print(f"Base url:{https_tunnel.public_url}")
+
+        file_path = os.path.abspath(os.path.dirname(".env"))
+
+        pattern = 'STK_CALLBACK=""'
+
+        new_line = f"{https_tunnel.public_url}/payment/stkcallback"
+
+        replacement = f'STK_CALLBACK={new_line}'
+
+        print("Updating env file")
+
+        update_env(
+            os.path.join(file_path, ".env"),
+            pattern,
+            replacement
+        )
+
+        ngrok_process = ngrok.get_ngrok_process()
+
+        ngrok_process.proc.wait()
+
+    except KeyboardInterrupt:
+
+        print("clossing the tunnel")
+
+        map(
+            lambda tunnel: ngrok.disconnect(tunnel.public_url),
+            ngrok.get_tunnels()
+        )
+
+        print("Updating the env file")
+        update_env(
+            os.path.join(file_path, ".env"),
+            replacement,
+            pattern,
+        )
+
+        ngrok.kill()
