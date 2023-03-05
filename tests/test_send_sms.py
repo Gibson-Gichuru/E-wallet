@@ -18,12 +18,16 @@ class TestSendSMS(BaseTestConfig):
 
         temp_mock.return_value = "testing"
 
-        recipients = ("test",)
+        recipient = "test"
         
-        send_sms("TESTING",recipients=recipients,data=None)
+        send_sms(
+            template="TESTING",
+            recipient=recipient,
+            data=None
+        )
 
         sms_mock.send.assert_called_with(
             temp_mock("TEST",data=None),
-            list(recipients),
+            list(recipient),
             self.sender
         )
