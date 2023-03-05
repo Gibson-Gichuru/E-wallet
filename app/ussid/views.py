@@ -4,8 +4,10 @@ from config import base_dir
 import os
 import json
 from app.models import User, Actions, Task
-from app.mpesa import Mpesa
+from app.mpesa import top_up
 from app.message import send_sms
+from flask import current_app
+from datetime import datetime
 
 
 class UssidCallback(MethodView):
@@ -16,8 +18,6 @@ class UssidCallback(MethodView):
         with open(os.path.join(base_dir,"ussid_response.json"), "r") as file:
 
             self.menu_text = json.load(file)
-
-        self.mpesa = Mpesa()
 
     def process_input(self, text):
 
@@ -47,6 +47,15 @@ class UssidCallback(MethodView):
 
                 return self.menu_text.get("top_up")
 
+            Task.schedule(
+                owner=user,
+                description="Account Activation",
+                target_func=top_up,
+                queue=current_app.queue,
+                amount=current_app.config.get("ACTIVATION_AMOUNT"),
+                phonenumber=user.phonenumber,
+            )
+
             return self.menu_text.get("activate_accept")
 
         return self.menu_text.get("register")
@@ -65,12 +74,21 @@ class UssidCallback(MethodView):
 
     def process_level_1_menu_option_3(self, user):
 
-        balance = float(user.account.balance)
+        balance = user.account.balance.to_eng_string()
+
+        data = {
+            "balance":balance,
+            "date":datetime.utcnow()
+        }
 
         Task.schedule(
             owner=user,
             description="Account Balance",
             target_func=send_sms,
+            queue=current_app.queue,
+            template="BALANCE",
+            data=data,
+            recipient=f"+{user.phonenumber}"
         )
 
         return self.menu_text.get(
@@ -81,11 +99,21 @@ class UssidCallback(MethodView):
 
         # Todo implement statement processing
 
+        setattr(User.account_statement, "_current_app", current_app)
+
+        records = user.account.generate_statement()
+
         Task.schedule(
             owner=user,
             description="Account Statement",
             target_func=User.account_statement,
-            user=user
+            queue=current_app.queue,
+            records=records,
+            cumulative_debit=user.account.cumulative_debit,
+            cumulative_credit=user.account.cumulative_credit,
+            balance=user.account.balance.to_eng_string(),
+            recipient=f"+{user.phonenumber}"
+            
         )
 
         return self.menu_text.get("statement")
@@ -116,7 +144,8 @@ class UssidCallback(MethodView):
         Task.schedule(
             owner=user,
             description="Topup Request",
-            target_func=self.mpesa.stk_push,
+            target_func=top_up,
+            queue=current_app.queue,
             amount=amount,
             phonenumber=user.phonenumber
         )
