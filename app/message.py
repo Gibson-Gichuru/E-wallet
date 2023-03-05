@@ -83,14 +83,18 @@ def template_constructor(template_type, data):
         return templates.get("DEACTIVATE")
 
 
-def send_sms(tempate, recipients=(),**kwargs):
+def send_sms(**kwargs):
+
+    temp = kwargs.get("template")
+    data = kwargs.get("data")
+    recp = kwargs.get("recipient")
 
     sender = os.environ.get("TALKING_SHORT_CODE")
 
-    sms_message = template_constructor(tempate,kwargs.get("data"))
+    sms_message = template_constructor(template_type=temp,data=data)
 
     if not sms_message or not SMS:
 
         return
 
-    SMS.send(sms_message,list(recipients),sender)
+    SMS.send(sms_message,list(recp),sender)
