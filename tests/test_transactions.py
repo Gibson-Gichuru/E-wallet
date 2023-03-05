@@ -22,9 +22,9 @@ class TransactionTests(BaseTestConfig):
             data=Settings.make_request_body(text=text)
         )
 
-    @mock.patch("app.ussid.views.Mpesa", autospec=True)
+    @mock.patch("app.ussid.views.top_up", autospec=True)
     @mock.patch("app.ussid.views.Task", autospec=True)
-    def test_top_up(self, task_mock, mpesa_mock):
+    def test_top_up(self, task_mock, top_up_mock):
 
         """User top up option initiates stk push"""
 
@@ -34,7 +34,8 @@ class TransactionTests(BaseTestConfig):
 
             owner=self.user,
             description="Topup Request",
-            target_func=mpesa_mock().stk_push,
+            target_func=top_up_mock,
+            queue=self.app.queue,
             amount=100,
             phonenumber=self.user.phonenumber
         )
