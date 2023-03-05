@@ -118,19 +118,34 @@ def tunnel():
 
         file_path = os.path.abspath(os.path.dirname(".env"))
 
-        pattern = 'STK_CALLBACK=""'
-
-        new_line = f"{https_tunnel.public_url}/payment/stkcallback"
-
-        replacement = f'STK_CALLBACK={new_line}'
+        urls = dict(
+            stk_callback={
+                "pattern":'STK_CALLBACK=""',
+                "replacement":f"STK_CALLBACK={https_tunnel.public_url}/payment/stkcallback"
+            },
+            stk_notification={
+                "pattern":'STK_NOTIFICATION=""',
+                "replacement":f"STK_NOTIFICATION={https_tunnel.public_url}/payment/stknotification"
+            },
+            b2c_notification={
+                "pattern":'B2C_NOTIFICATION=""',
+                "replacement":f"B2C_NOTIFICATION={https_tunnel.public_url}/payment/b2cnotification"
+            }
+        )
 
         print("Updating env file")
 
-        update_env(
-            os.path.join(file_path, ".env"),
-            pattern,
-            replacement
-        )
+        for url, item in urls.items():
+
+            print(f"updating {url}")
+
+            update_env(
+                os.path.join(file_path, ".env"),
+                item.get("pattern"),
+                item.get("replacement")
+            )
+
+            print(f"{url} full url: {item.get('replacement')}")
 
         ngrok_process = ngrok.get_ngrok_process()
 
@@ -145,11 +160,13 @@ def tunnel():
             ngrok.get_tunnels()
         )
 
-        print("Updating the env file")
-        update_env(
-            os.path.join(file_path, ".env"),
-            replacement,
-            pattern,
-        )
+        print("Cleaning the env file")
+        for url, item in urls.items():
+            
+            update_env(
+                os.path.join(file_path, ".env"),
+                item.get("replacement"),
+                item.get("pattern"),
+            )
 
         ngrok.kill()
