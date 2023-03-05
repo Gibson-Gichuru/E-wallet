@@ -1,7 +1,23 @@
 import os
-
+import logging
 
 base_dir = os.path.abspath(os.path.dirname(__file__))
+formatter = logging.Formatter("%(levelname)s :: %(message)s :: %(asctime)s")
+
+
+def logger_setup(name, file, level=logging.INFO):
+
+    handler = logging.FileHandler(file)
+
+    handler.setFormatter(formatter)
+
+    logger = logging.getLogger(name)
+
+    logger.setLevel(level)
+
+    logger.addHandler(handler)
+
+    return logger
 
 
 class Config:
