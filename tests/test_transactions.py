@@ -45,18 +45,31 @@ class TransactionTests(BaseTestConfig):
             self.menu.get("topup_success")
         )
 
+    @mock.patch("app.ussid.views.datetime", autospec=True)
     @mock.patch("app.ussid.views.send_sms", autospec=True)
     @mock.patch("app.ussid.views.Task", autospec=True)
-    def test_balance(self, task_mock,msg_mock):
+    def test_balance(self, task_mock,msg_mock, date):
 
         """Balance request schedules a task"""
 
+        date.utcnow.return_value = "test date"
+
         self.transact(text="3")
+
+        data = {
+            "balance":self.user.account.balance.to_eng_string(),
+            "date":date.utcnow()
+        }
 
         task_mock.schedule.assert_called_with(
             owner=self.user,
             description="Account Balance",
             target_func=msg_mock,
+            queue=self.app.queue,
+            template="BALANCE",
+            data=data,
+            recipient=f"+{self.user.phonenumber}"
+
         )
 
     @mock.patch("app.ussid.views.Task", autospec=True)
@@ -64,11 +77,18 @@ class TransactionTests(BaseTestConfig):
 
         response = self.transact("4")
 
+        records = self.user.account.generate_statement()
+
         task_mock.schedule.assert_called_with(
             owner=self.user,
             description="Account Statement",
             target_func=User.account_statement,
-            user=self.user
+            queue=self.app.queue,
+            records=records,
+            cumulative_debit=self.user.account.cumulative_debit,
+            cumulative_credit=self.user.account.cumulative_debit,
+            balance=self.user.account.balance.to_eng_string(),
+            recipient=f"+{self.user.phonenumber}"
 
         )
 
