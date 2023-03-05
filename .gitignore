@@ -6,3 +6,4 @@ design/
 *.sqlite
 *.sqlite-*
 *.conf
+*.log
