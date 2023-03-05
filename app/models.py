@@ -1,6 +1,7 @@
 from app import db
 from datetime import datetime
 from app.message import send_sms
+from app.job_callbacks import success, failure
 
 
 class CrudOperations:
@@ -291,17 +292,6 @@ class Task(db.Model, CrudOperations):
         return new_task
 
     @staticmethod
-    def update_task_status(job, connection, result, *args, **kwargs):
-
-        task = Task.query.filter_by(
-            task_id=job.id
-        ).first()
-
-        task.completed = True
-
-        task.update()
-
-    @staticmethod
     def schedule(
         owner,
         target_func=None,
@@ -315,8 +305,9 @@ class Task(db.Model, CrudOperations):
         job = queue.enqueue(
             target_func,
             description=description,
-            on_success=on_success if on_success else Task.update_task_status,
-            on_failure=on_failure if on_failure else Task.update_task_status,
+            on_success=on_success if on_success else success,
+            on_failure=on_failure if on_failure else failure,
+            *args,
             **kwargs
         )
 
