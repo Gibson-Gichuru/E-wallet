@@ -1,37 +1,72 @@
 {
-	"Body": 
-	{
-		"stkCallback": 
-		{
-			"MerchantRequestID": "21605-295434-4",
-			"CheckoutRequestID": "ws_CO_04112017184930742",
-			"ResultCode": 0,
-			"ResultDesc": "The service request is processed successfully.",
-			"CallbackMetadata": 
-			{
-				"Item": 
-				[
-					{
-						"Name": "Amount",
-						"Value": 1
-					},
-					{
-						"Name": "MpesaReceiptNumber",
-						"Value": "LK451H35OP"
-					},
-					{
-						"Name": "Balance"
-					},
-					{
-						"Name": "TransactionDate",
-						"Value": 20171104184944
-					},
-					{
-						"Name": "PhoneNumber",
-						"Value": 254727894083
-					}
-				]
-			}
-		}
+	"failed":{
+		"category": "MobileCheckout",
+		"description": "The user is not within network coverage",
+		"destination": "PaymentWallet",
+		"destinationType": "Wallet",
+		"direction": "Inbound",
+		"origin": "ApiRequest",
+		"productName": "E-wallet",
+		"provider": "Athena",
+		"providerChannel": "test",
+		"providerMetadata": {},
+		"requestMetadata": {},
+		"source": "test",
+		"sourceType": "PhoneNumber",
+		"status": "Failed",
+		"transactionId": "ATPid_47a0d5168d4f42af31ae697631b04723",
+		"value": "KES 60.0000"
+	},
+	"success":{
+		"category": "MobileCheckout",
+		"description": "Received Mobile Checkout funds from test",
+		"destination": "PaymentWallet",
+		"destinationType": "Wallet",
+		"direction": "Inbound",
+		"origin": "ApiRequest",
+		"productName": "E-wallet",
+		"provider": "Athena",
+		"providerChannel": "525900",
+		"providerFee": "KES 0.6200",
+		"providerMetadata": {
+			"KYCInfo1": "Sample KYCInfo1",
+			"KYCInfo2": "Sample KYCInfo2"
+		},
+		"providerRefId": "b88be366-9e71-4d25-8b37-9e5ea9dc7e43",
+		"requestMetadata": {},
+		"source": "test",
+		"sourceType": "PhoneNumber",
+		"status": "Success",
+		"transactionDate": "20230305091608",
+		"transactionFee": "KES 0.6200",
+		"transactionId": "ATPid_18df86e96a7896eaf7fd8a263394a55f",
+		"value": "KES 62.0000"
+	},
+
+	"c2b_success":{
+		"category": "MobileC2B",
+		"clientAccount": "test",
+		"description": "Received Mobile C2B Payment from test",
+		"destination": "PaymentWallet",
+		"destinationType": "Wallet",
+		"direction": "Inbound",
+		"origin": "Provider",
+		"productName": "E-wallet",
+		"provider": "Athena",
+		"providerChannel": "2213",
+		"providerFee": "KES 1.5600",
+		"providerMetadata": {
+			"KYCField1": "KYCValue1",
+			"KYCField2": "KYCValue2"
+		},
+		"providerRefId": "65f045cf-0a22-4ac8-92e8-9f26e4443d24",
+		"requestMetadata": {},
+		"source": "test",
+		"sourceType": "PhoneNumber",
+		"status": "Success",
+		"transactionDate": "20230305092126",
+		"transactionFee": "KES 1.0000",
+		"transactionId": "ATPid_479a07610e9426802d6acdc5a932c393",
+		"value": "KES 156.0000"
 	}
 }

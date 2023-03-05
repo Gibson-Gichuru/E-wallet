@@ -1,183 +1,239 @@
 from tests import BaseTestConfig
-from tests.settings import Settings
-from app.mpesa import Mpesa, MpesaConsts
 from unittest import mock
-from requests.exceptions import RequestException
-from datetime import datetime
-from collections import namedtuple
-import base64
+from app.mpesa import Payments, PaymentException
+from tests.settings import Settings
+from config import base_dir
 import json
+import os
 
 
 class TestMpesaAuth(BaseTestConfig):
 
-    def setUp(self):
+    def setUp(self) -> None:
 
         super().setUp()
 
-        self.mpesa = Mpesa()
+        self.payment = Payments()
 
-    @mock.patch("app.mpesa.base64",autospec=True)
-    def test_consumer_tokens_encoding(self, b64_mock):
-        
-        consumer_key = "some key"
-        
-        consumer_secret = "some secret"
-        
-        Mpesa.encode(consumer_key,consumer_secret)
+        self.phonenumber = "test"
+        self.amount = 1
+        self.metadata = {"test":"test"}
 
-        b64_mock.b64encode.assert_called_with(
-            f"{consumer_key}:{consumer_secret}".encode("utf-8")
+    @mock.patch("app.mpesa.africastalking",autospec=True)
+    def test_payment_object_config(self,afr_mock):
+
+        afr_mock.initialize.assert_called
+
+    @mock.patch("app.mpesa.africastalking", autospec=True)
+    def test_invalid_amount(self, afr_mock):
+
+        # test for invalid amount
+        
+        with self.assertRaises(ValueError):
+
+            self.payment.checkout(
+                phonenumber=self.phonenumber,
+                amount=self.amount,
+                metadata=self.metadata
+            )
+
+    @mock.patch("app.mpesa.NamedTemporaryFile", autospec=True)
+    @mock.patch("app.mpesa.rename", autospec=True)
+    @mock.patch("app.mpesa.africastalking", autospec=True)
+    def test_success_payment_checkout(self, afr_mock, _, _2):
+
+        afr_mock.Payment.mobile_checkout.return_value = {
+            "status": "PendingConfirmation",
+            "description": "test",
+            "transactionId": "test",
+            "providerChannel": "test",
+        }
+        
+        # test for a success checkout
+
+        self.payment.checkout("test", 10, self.metadata)
+
+        afr_mock.Payment.mobile_checkout.assert_called_with(
+            Payments.PRODUCTNAME,
+            f"+{self.phonenumber}",
+            Payments.CURRENCY_CODE,
+            10,
+            self.metadata
         )
 
-    @mock.patch("app.mpesa.requests", autospec=True)
-    def test_auth_token_called(self,request_mock):
-
-        # assert that tokens were fetched
-        self.mpesa.auth_tokens()
-
-        request_mock.get.assert_called()
-
-    @mock.patch("app.mpesa.requests", autospec=True)
-    def test_auth_token_exception_raised(self, request_mock):
-
-        request_mock.get.side_effect = RequestException
-
-        auth_tokens = self.mpesa.auth_tokens()
-
-        self.assertIsNone(auth_tokens)
-
-    @mock.patch("app.mpesa.requests", autospec=True)
-    def test_valid_tokens_returned(self, request_mock):
-
-        request_mock.get.return_value = {
-            "access_token": "some token",
-            "expires_in": "in the future"
+        # test for a failed checkout
+        
+    @mock.patch("app.mpesa.africastalking", autospec=True)
+    def test_failed_checkout(self, afri_mock):
+        
+        afri_mock.Payment.mobile_checkout.return_value = {
+            "status": "InvalidRequest",
+            "description": "testing",
         }
 
-        auth_tokens = self.mpesa.auth_tokens()
+        with self.assertRaises(PaymentException):
 
-        self.assertIsNotNone(auth_tokens)
+            self.payment.checkout(
+                phonenumber=self.phonenumber,
+                amount=10,
+                metadata=self.metadata
+            )
 
+    @mock.patch("app.mpesa.NamedTemporaryFile", autospec=True)
+    @mock.patch("app.mpesa.rename", autospec=True)
+    @mock.patch("app.mpesa.africastalking", autospec=True)
+    def test_write_to_file(self, afri_mock, rename_mock, temp_mock):
 
-class TestMpesaSTK(BaseTestConfig):
+        afri_mock.Payment.mobile_checkout.return_value = {
+            "status": "PendingConfirmation",
+            "description": "test",
+            "transactionId": "test",
+            "providerChannel": "test",
+        }
 
-    def setUp(self):
-        
-        super().setUp()
+        fake_file = mock.Mock()
 
-        self.mpesa = Mpesa()
+        fake_file.name = "test"
 
-        self.stk_results = namedtuple("Results", "succes")
+        temp_mock.return_value.__enter__.return_value = fake_file
 
-        self.expected_time = datetime.strptime(
-            "20230206145044",
-            MpesaConsts.TIMESTAMP_FORMAT.value
-        )
+        self.payment.checkout("test", 10)
 
-        self.encoded_string = "{}{}{}".format(
-            self.app.config.get("BUSINESS_SHORT_CODE"),
-            self.app.config.get("PASS_KEY"),
-            "20230206145044"
-        )
+        fake_file.write.assert_called_with("test".encode('utf-8'))
 
-        self.expected_pass = base64.b64encode(
-            self.encoded_string.encode("utf-8")
-        )
-
-    @mock.patch("app.mpesa.base64", autospec=True)
-    @mock.patch("app.mpesa.datetime", autospec=True)
-    def test_lmp_password_generator(self, datetime_mock, b64_mock):
-
-        datetime_mock.now.return_value = self.expected_time
-
-        b64_mock.b64encode.return_value = self.expected_pass
-
-        mpesa_password = Mpesa.lipa_na_mpesa_pass()
-
-        b64_mock.b64encode.assert_called_with(
-            self.encoded_string.encode("utf-8")
-        )
-
-        self.assertEqual(self.expected_pass, mpesa_password)
-
-    @mock.patch("app.mpesa.requests", autospec=True)
-    def test_mpesa_stk_push_success(self, request_mock):
-
-        redis_mock = mock.Mock(self.app.redis)
-
-        stk_ack_data = Settings.stk_push_ack()
-
-        request_mock.post.return_value = stk_ack_data
-
-        results = self.mpesa.stk_push(
-            amount=10,
-            phonenumber="test",
-            redis_obj=redis_mock
-        )
-
-        self.assertEqual(
-            results,self.stk_results(True)
-        )
-
-        # assert that  stk push info is cached
-
-        redis_mock.set.assert_called_with(
-            stk_ack_data.get("CheckoutRequestID"),
-            "test"
-        )
-
-    @mock.patch("app.mpesa.requests")
-    def test_mpesa_stk_push_fail(self, request_mock):
-
-        request_mock.post.side_effect = RequestException
-
-        response = self.mpesa.stk_push(
-            amount=10,
-            phonenumber="test"
-        )
-
-        self.assertEqual(
-            response,
-            self.stk_results(False)
-        )
+        rename_mock.assert_called_with(fake_file.name, "test.checkout")
 
 
-class TestSTKCallBack(BaseTestConfig):
+class TestSTKCheckout(BaseTestConfig):
 
     def setUp(self):
 
         super().setUp()
 
-        self.user = Settings.create_user(active=True)
+        self.success_checkout = Settings.checkout_response()
 
-        self.user.add(self.user)
+        self.failed_checkout = Settings.checkout_response(
+            success=False
+        )
 
     @mock.patch("app.payments.views.datetime", autospec=True)
+    @mock.patch("app.payments.views.remove", autospec=True)
+    @mock.patch("app.payments.views.User")
     @mock.patch("app.payments.views.Payment", autospec=True)
-    @mock.patch("app.payments.views.current_app.redis", autospec=True)
-    def test_stk_callback(self, redis_mock, payment_mock, date_mock):
+    def test_success_transaction(self,payment_mock, user_mock, rm_mock, date_mk):
 
-        redis_mock.get.return_value = self.user.phonenumber.encode("utf-8")
+        payment_obj = mock.Mock()
 
-        stk_data = Settings.stk_callback_data(
-            phonenumber=self.user.phonenumber,
-            amount=10
-        )
+        user_mock.query.filter_by.first.return_value = mock.Mock()
+        
+        user = user_mock.query.filter_by().first()
+        
+        payment_mock.return_value = payment_obj
+
+        date_mk.strptime.return_value = "test"
+
+        with mock.patch("app.payments.views.open",mock.mock_open(read_data="test")):
+
+            self.client.post(
+                Settings.STKCALLBACK,
+                headers={"content-type": "application/json"},
+                data=json.dumps(self.success_checkout),
+            )
+            # assert that a payment object has been created
+
+            payment_mock.assert_called_with(
+                transaction_id=self.success_checkout.get("transactionId"),
+                account=user.account,
+                date=date_mk.strptime(),
+                amount=self.success_checkout.get("value")
+            )
+
+            rm_mock.assert_called_with(
+                os.path.join(
+                    base_dir,
+                    "{}.checkout".format(
+                        self.success_checkout.get(
+                            "transactionId"
+                        )
+                    )
+                )
+            )
+        
+    @mock.patch("app.payments.views.datetime", autospec=True)
+    @mock.patch("app.payments.views.remove", autospec=True)
+    @mock.patch("app.payments.views.User")
+    @mock.patch("app.payments.views.Payment", autospec=True)
+    def test_failed_transaction(self, p_mock, u_mock, rm_mock, dt_mock):
+
+        dt_mock.strptime.return_value = "test"
+
+        with mock.patch("app.payments.views.open", mock.mock_open(read_data="test")) as file:
+
+            self.client.post(
+                Settings.STKCALLBACK,
+                headers={"content-type": "application/json"},
+                data=json.dumps(self.failed_checkout),
+            )
+
+            p_mock.assert_not_called()
+
+            rm_mock.assert_called_with(
+                os.path.join(
+                    base_dir,
+                    "{}.checkout".format(
+                        self.failed_checkout.get(
+                            "transactionId"
+                        )
+                    )
+                )
+            )
+
+
+class TestC2BTransaction(BaseTestConfig):
+
+    def setUp(self):
+
+        super().setUp()
+
+        self.c2b_response = Settings.checkout_response(c2b=True)
+
+    @mock.patch("app.payments.views.datetime", autospec=True)
+    @mock.patch("app.payments.views.User")
+    @mock.patch("app.payments.views.Payment", autospec=True)
+    def test_success_transaction(self, payment_mock, user_mock, date_mock):
+
+        user_mock.query.filter_by().first.return_value = mock.Mock()
 
         date_mock.strptime.return_value = "test"
 
-        payment_info = stk_data[0]["Body"]["stkCallback"]["CallbackMetadata"]["Item"]
+        user = user_mock.query.filter_by().first()
 
         self.client.post(
             Settings.STKCALLBACK,
             headers={"content-type": "application/json"},
-            data=json.dumps(stk_data[0]),
+            data=json.dumps(self.c2b_response),
         )
 
         payment_mock.assert_called_with(
-            transaction_id=payment_info[1]["Value"],
-            account=self.user.account,
+            transaction_id=self.c2b_response.get("transactionId"),
+            account=user.account,
             date=date_mock.strptime(),
-            amount=payment_info[0]["Value"]
+            amount=self.c2b_response.get("value")
         )
+
+    @mock.patch("app.payments.views.datetime", autospec=True)
+    @mock.patch("app.payments.views.User")
+    @mock.patch("app.payments.views.Payment", autospec=True)
+    def test_unexpected_payment(self,payment_mock, user_mock, date_mock):
+
+        # test user not found
+
+        user_mock.query.filter_by().first.return_value = None
+
+        self.client.post(
+            Settings.STKCALLBACK,
+            headers={"content-type": "application/json"},
+            data=json.dumps(self.c2b_response),
+        )
+
+        payment_mock.assert_not_called()

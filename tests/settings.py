@@ -64,35 +64,18 @@ class Settings:
         return templates
 
     @staticmethod
-    def stk_push_ack(success=True):
-
-        response = {
-            "MerchantRequestID": "test",
-            "CheckoutRequestID": "test",
-            "ResponseCode": "0",
-            "ResponseDescription": "test",
-            "CustomerMessage": "test"
-        }
-
-        if not success:
-
-            response["ResponseCode"] = "1"
-
-        return response
-    
-    @staticmethod
-    def stk_callback_data(phonenumber, amount):
+    def checkout_response(success=True, c2b=False):
 
         with open(os.path.join(base_dir, "tests/stk-response.json"), "r") as file:
 
-            data = json.load(file)
+            response = json.load(file)
 
-        items = data["Body"]["stkCallback"]["CallbackMetadata"]["Item"]
+        if not success:
 
-        MpesaReceiptNumber = items[1]["Value"]
+            return response.get("failed")
+        
+        if c2b:
 
-        items[-1]["Value"] = phonenumber
-
-        items[0]["Value"] = amount
-
-        return data,MpesaReceiptNumber
+            return response.get("c2b_success")
+        
+        return response.get("success")
