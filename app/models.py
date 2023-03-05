@@ -52,6 +52,8 @@ class User(db.Model, CrudOperations):
 
     account = db.relationship("Account", uselist=False, back_populates="holder")
 
+    tasks = db.relationship("Task", backref="owner", lazy="dynamic")
+
     def __init__(self, username, phonenumber) -> None:
         
         self.username = username
@@ -63,22 +65,27 @@ class User(db.Model, CrudOperations):
         self.account  = Account()
 
     @staticmethod
-    def account_statement(user):
+    def account_statement(*args, **kwargs):
 
-        sms_format = Account.sms_statement_format()
+        records = kwargs.get("records")
+        cumulative_debit = kwargs.get("cumulative_debit")
+        cumulative_credit = kwargs.get("cumulative_credit")
+        balance = kwargs.get("balance")
+        recipient = kwargs.get("recipient")
 
-        recipient = "+" + user.phonenumber
+        sms_format = Account.sms_statement_format(records=records)
 
         data = {
             "date":datetime.utcnow(),
             "records_str":sms_format,
-            "cumulative_debit":user.account.cumulative_debit,
-            "cumulative_credit":user.account.cumulative_credit,
-            "balance":user.account.balance
+            "cumulative_debit":cumulative_debit,
+            "cumulative_credit":cumulative_credit,
+            "balance":balance
         }
+
         send_sms(
             template="STATEMENT",
-            recipients=(recipient,),
+            recipient="+" + recipient,
             data=data
         )
 
@@ -224,7 +231,7 @@ class Payment(db.Model, CrudOperations):
 
     account_id = db.Column(db.Integer, db.ForeignKey('account.account_id'))
 
-    transaction_date = db.Column(db.DateTime, nullable=False)
+    transaction_date = db.Column(db.DateTime, default=datetime.utcnow)
 
     amount = db.Column(db.Numeric(5,2), nullable=False)
 
@@ -274,7 +281,7 @@ class Task(db.Model, CrudOperations):
 
         self.task_description = desc
 
-        self.initiator = initiator
+        self.owner = initiator
 
         self.task_id = task_id
 
