@@ -1,41 +1,116 @@
 from flask.views import MethodView
-from flask import request, jsonify, abort
+from flask import request, jsonify
 from app.models import User, Payment
-from flask import current_app
 from datetime import datetime
-from app.mpesa import MpesaConsts
+from config import base_dir
+import os
+from os import remove
 
 
 class StkCallback(MethodView):
+
+    def delete_file(self, filename):
+
+        try:
+            remove(filename)
+
+        except Exception as error:
+
+            pass
+        
+    def handle_succes_checkout(self, data):
+
+        with open(
+            os.path.join(
+                base_dir, "{}.checkout".format(
+                    data.get("transactionId")
+                )
+            )
+        ) as file:
+
+            user_phone = file.readline()
+
+        user = User.query.filter_by(
+            phonenumber=user_phone
+        ).first()
+
+        payment = Payment(
+            transaction_id=data.get("transactionId"),
+            account=user.account,
+            date=datetime.strptime(
+                data.get(""),
+                "%y%m%d%H%M%S"
+            ),
+            amount=data.get("value")
+        )
+
+        payment.add(payment)
+
+        self.delete_file(
+            os.path.join(
+                base_dir,
+                "{}.checkout".format(
+                    data.get("transactionId")
+                )
+            )
+        )
+
+    def handle_failed_checkout(self, data):
+
+        self.delete_file(
+            os.path.join(
+                base_dir,
+                "{}.checkout".format(
+                    data.get("transactionId")
+                )
+            )
+        )
 
     def post(self):
 
         request_data = request.get_json()
 
-        if not request_data:
+        payment_type = request_data.get("category")
 
-            abort(400)
+        status = request_data.get("status")
 
-        checkout_id = request_data["Body"]["stkCallback"]["CheckoutRequestID"]
+        if payment_type == "MobileCheckout" and status == "Success":
 
-        payment_info = request_data["Body"]["stkCallback"]["CallbackMetadata"]["Item"]
+            self.handle_succes_checkout(request_data)
 
-        phone_number = current_app.redis.get(checkout_id).decode("utf-8")
+            return jsonify({"message":"ok"})
 
-        user = User.query.filter_by(phonenumber=phone_number).first()
+        if payment_type == "MobileCheckout" and status == "Failed":
 
-        timestamp = datetime.strptime(
-            str(payment_info[3]["Value"]),
-            MpesaConsts.TIMESTAMP_FORMAT.value
-        )
+            self.delete_file(
+                os.path.join(
+                    base_dir,
+                    "{}.checkout".format(
+                        request_data.get("transactionId")
+                    )
+                )
+            )
 
-        payment = Payment(
-            transaction_id=payment_info[1]["Value"],
-            account=user.account,
-            date=timestamp,
-            amount=payment_info[0]["Value"]
-        )
+            return jsonify({"message":"ok"})
+        
+        # handle C2B payment
 
-        payment.add(payment)
+        user = User.query.filter_by(
+            username=request_data.get("clientAccount")
+        ).first()
+
+        if user:
+
+            payment = Payment(
+                transaction_id=request_data.get("transactionId"),
+                account=user.account,
+                date=datetime.strptime(
+                    request_data.get(""),
+                    "%y%m%d%H%M%S"
+                ),
+                amount=request_data.get("value")
+            )
+
+            payment.add(payment)
 
         return jsonify({"message":"ok"})
