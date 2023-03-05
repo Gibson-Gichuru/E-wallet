@@ -67,6 +67,8 @@ class Config:
 
 class Development(Config):
 
+    DEBUG = True
+
     SQLALCHEMY_DATABASE_URI = os.environ.get("DATABASE_URI") or \
         "sqlite:///" + os.path.join(base_dir, "dev-data.sqlite")
 
