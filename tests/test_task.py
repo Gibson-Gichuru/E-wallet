@@ -17,8 +17,10 @@ class TestTaskSchedule(BaseTestConfig):
 
         self.user.add(self.user)
     
+    @mock.patch("app.models.failure", autospec=True)
+    @mock.patch("app.models.success", autospec=True)
     @mock.patch("app.models.Task", autospec=True)
-    def test_task_schedule(self,task_mock):
+    def test_task_schedule(self,task_mock, success,failure):
 
         # queue_mock = mock.MagicMock(self.app.queue)
 
@@ -44,8 +46,8 @@ class TestTaskSchedule(BaseTestConfig):
         self.app.queue.enqueue.assert_called_with(
            target,
            description=description,
-           on_success=task_mock.update_task_status,
-           on_failure=task_mock.update_task_status,
+           on_success=success,
+           on_failure=failure,
            a=1,
            b=2
        )
