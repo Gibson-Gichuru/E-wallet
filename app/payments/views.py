@@ -1,6 +1,6 @@
 from flask.views import MethodView
 from flask import request, jsonify
-from app.models import User, Payment
+from app.models import User, Payment, Account, Actions
 from datetime import datetime
 from config import base_dir
 import os
@@ -115,18 +115,28 @@ class StkCallback(MethodView):
             username=request_data.get("clientAccount")
         ).first()
 
-        if user:
+        if user and user.account.can(Actions.TRANSACT):
+
+            amount = request_data.get("value").replace("KES", "")
+
+            amount = amount.replace("'", "")
 
             payment = Payment(
                 transaction_id=request_data.get("transactionId"),
                 account=user.account,
                 date=datetime.strptime(
-                    request_data.get(""),
+                    request_data.get("transactionDate"),
                     "%y%m%d%H%M%S"
                 ),
-                amount=request_data.get("value")
+                amount=float(amount)
             )
 
             payment.add(payment)
+
+            Account.update_balance(
+                transaction_type="CREDIT",
+                holder=user,
+                amount=int(float(amount))
+            )
 
         return jsonify({"message":"ok"})
