@@ -116,11 +116,12 @@ class TestSTKCheckout(BaseTestConfig):
             success=False
         )
 
+    @mock.patch("app.payments.views.Account", autospec=True)
     @mock.patch("app.payments.views.datetime", autospec=True)
     @mock.patch("app.payments.views.remove", autospec=True)
     @mock.patch("app.payments.views.User")
     @mock.patch("app.payments.views.Payment", autospec=True)
-    def test_success_transaction(self,payment_mock, user_mock, rm_mock, date_mk):
+    def test_success_transaction(self,payment_mock, user_mock, rm_mock, date_mk,acc_mock):
 
         payment_obj = mock.Mock()
 
@@ -134,6 +135,10 @@ class TestSTKCheckout(BaseTestConfig):
 
         with mock.patch("app.payments.views.open",mock.mock_open(read_data="test")):
 
+            amount = self.success_checkout.get("value").replace("KES", "")
+
+            amount = amount.replace("'","").strip()
+
             self.client.post(
                 Settings.STKCALLBACK,
                 headers={"content-type": "application/json"},
@@ -145,7 +150,13 @@ class TestSTKCheckout(BaseTestConfig):
                 transaction_id=self.success_checkout.get("transactionId"),
                 account=user.account,
                 date=date_mk.strptime(),
-                amount=self.success_checkout.get("value")
+                amount=float(amount)
+            )
+
+            acc_mock.update_balance.assert_called_with(
+                transaction_type="CREDIT",
+                holder=user,
+                amount=int(float(amount))
             )
 
             rm_mock.assert_called_with(
@@ -197,10 +208,15 @@ class TestC2BTransaction(BaseTestConfig):
 
         self.c2b_response = Settings.checkout_response(c2b=True)
 
+    @mock.patch("app.payments.views.Account", autospec=True)
     @mock.patch("app.payments.views.datetime", autospec=True)
     @mock.patch("app.payments.views.User")
     @mock.patch("app.payments.views.Payment", autospec=True)
-    def test_success_transaction(self, payment_mock, user_mock, date_mock):
+    def test_C2B_success_transaction(self, payment_mock, user_mock, date_mock, acc_mock):
+
+        amount = self.c2b_response.get("value").replace("KES", "")
+
+        amount = amount.replace("'","").strip()
 
         user_mock.query.filter_by().first.return_value = mock.Mock()
 
@@ -218,13 +234,19 @@ class TestC2BTransaction(BaseTestConfig):
             transaction_id=self.c2b_response.get("transactionId"),
             account=user.account,
             date=date_mock.strptime(),
-            amount=self.c2b_response.get("value")
+            amount=float(amount)
+        )
+
+        acc_mock.update_balance.assert_called_with(
+            transaction_type="CREDIT",
+            holder=user,
+            amount=int(float(amount))
         )
 
     @mock.patch("app.payments.views.datetime", autospec=True)
     @mock.patch("app.payments.views.User")
     @mock.patch("app.payments.views.Payment", autospec=True)
-    def test_unexpected_payment(self,payment_mock, user_mock, date_mock):
+    def test_C2B_unexpected_payment(self,payment_mock, user_mock, date_mock):
 
         # test user not found
 
