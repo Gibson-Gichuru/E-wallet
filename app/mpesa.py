@@ -68,8 +68,8 @@ class Payments:
             )
 
 
-def top_up(phonenumber, amount):
+def top_up(phonenumber, amount, metadata={}):
 
     pay = Payments()
 
-    pay.checkout(phonenumber, amount)
+    pay.checkout(phonenumber, amount, metadata=metadata)
