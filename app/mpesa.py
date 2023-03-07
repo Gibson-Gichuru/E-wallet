@@ -34,6 +34,7 @@ class Payments:
 
     def checkout(self, phonenumber,amount, metadata={}):
 
+        amount = int(amount)
         if amount < 10:
 
             raise ValueError("Invalid Amount")
