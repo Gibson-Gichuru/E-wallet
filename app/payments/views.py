@@ -34,18 +34,34 @@ class StkCallback(MethodView):
             phonenumber=user_phone
         ).first()
 
+        amount = data.get("value").replace("KES", "")
+
+        amount = amount.replace("'", "")
+
         payment = Payment(
             transaction_id=data.get("transactionId"),
             account=user.account,
             date=datetime.strptime(
-                data.get(""),
-                "%y%m%d%H%M%S"
+                data.get("transactionDate"),
+                "%Y%m%d%H%M%S"
             ),
-            amount=data.get("value")
+            amount=float(amount)
         )
 
         payment.add(payment)
 
+        Account.update_balance(
+            transaction_type="CREDIT",
+            holder=user,
+            amount=int(float(amount))
+        )
+
+        metadata = data.get("requestMetadata")
+
+        if metadata and metadata.get("purpose") == "activation":
+
+            user.account.activate()
+            
         self.delete_file(
             os.path.join(
                 base_dir,
