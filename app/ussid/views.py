@@ -142,6 +142,10 @@ class UssidCallback(MethodView):
 
         # Todo topup process
 
+        if amount < 10:
+
+            return self.menu_text.get("top_up_invalid")
+
         Task.schedule(
             owner=user,
             description="Topup Request",
