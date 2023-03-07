@@ -54,6 +54,7 @@ class UssidCallback(MethodView):
                 queue=current_app.queue,
                 amount=current_app.config.get("ACTIVATION_AMOUNT"),
                 phonenumber=user.phonenumber,
+                metadata={"purpose":"activation"}
             )
 
             return self.menu_text.get("activate_accept")
