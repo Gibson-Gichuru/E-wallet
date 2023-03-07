@@ -39,7 +39,7 @@ class Config:
     @staticmethod
     def init_app(app):
 
-        from app.models import Account, Payment
+        from app.models import Account
 
         from sqlalchemy import event
 
@@ -58,12 +58,7 @@ class Config:
             "set",
             inject_app_obj(Account.balance_notify)
         )
-        event.listen(
-            Payment,
-            "after_insert",
-            inject_app_obj(Payment.register_to_account)
-        )
-
+        
 
 class Development(Config):
 
