@@ -261,17 +261,6 @@ class Payment(db.Model, CrudOperations):
         self.transaction_date = date
 
         self.amount = amount
-
-    @staticmethod
-    def register_to_account(mapper, conn, target):
-
-        Task.schedule(
-            owner=target.account.holder,
-            description="Account Balance update",
-            target_func=Account.update_balance,
-            amount=target.amount,
-            holder=target.account.holder
-        )
         
     def __repr__(self) -> str:
         
