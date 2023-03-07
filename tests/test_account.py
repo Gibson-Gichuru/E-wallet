@@ -28,7 +28,8 @@ class TestAccount(BaseTestConfig):
             owner=self.user,
             description="Balance Notification",
             target_func=msg,
-            queue=self.app.queue
+            queue=self.app.queue,
+            template="BALANCE"
         )
 
     @skip("No implemented yet")

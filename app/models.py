@@ -192,7 +192,8 @@ class Account(db.Model, CrudOperations):
                 owner=target.holder,
                 description="Balance Notification",
                 target_func=send_sms,
-                queue=app.queue
+                queue=app.queue,
+                template="BALANCE"
             )
 
     @staticmethod
