@@ -217,6 +217,16 @@ class Account(db.Model, CrudOperations):
             action & self.status.actions
         ) == action
 
+    def activate(self):
+
+        status = Status.query.filter_by(
+            status_name="Active"
+        ).first()
+
+        self.status = status
+
+        self.update()
+
     def deactivate(self):
 
         status = Status.query.filter_by(
