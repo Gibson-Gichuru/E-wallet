@@ -188,8 +188,12 @@ class Account(db.Model, CrudOperations):
 
         with app.app_context():
 
+            user = User.query.filter_by(
+                username=target.holder.username
+            ).first()
+
             Task.schedule(
-                owner=target.holder,
+                owner=user,
                 description="Balance Notification",
                 target_func=send_sms,
                 queue=app.queue,
@@ -199,11 +203,13 @@ class Account(db.Model, CrudOperations):
     @staticmethod
     def status_report_notify(target, value, oldvalue, initiator):
 
-        Task.schedule(
-            owner=target.holder,
-            description="Account Status Change",
-            target_func=send_sms
-        )
+        # Task.schedule(
+        #     owner=target.holder,
+        #     description="Account Status Change",
+        #     target_func=send_sms
+        # )
+
+        pass
 
     def can(self, action):
 
