@@ -69,8 +69,6 @@ class Development(Config):
 
     MPESA_PHONENUMBER = os.environ.get("MPESA_PHONENUMBER")
 
-    ACTIVATION_AMOUNT = 1
-
     @staticmethod
     def init_app(app):
 
@@ -85,8 +83,6 @@ class Testing(Config):
         "sqlite:///" + os.path.join(base_dir, "test-data.sqlite")
 
     MPESA_PHONENUMBER = os.environ.get("MPESA_PHONENUMBER")
-
-    ACTIVATION_AMOUNT = 1
     
     @staticmethod
     def init_app(app):
