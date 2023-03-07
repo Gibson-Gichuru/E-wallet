@@ -1,6 +1,7 @@
 from tests import BaseTestConfig
 from app.models import User
 from tests.settings import Settings
+from unittest import mock
 
 
 class TestUssidCallbackRoute(BaseTestConfig):
@@ -119,7 +120,9 @@ class TestAccountRegistation(BaseTestConfig):
 
         self.assertEqual(response.text, self.menu.get("suspended"))
 
-    def test_account_activation_accepted(self):
+    @mock.patch("app.ussid.views.top_up", autospec=True)
+    @mock.patch("app.ussid.views.Task", autospec=True)
+    def test_account_activation_accepted(self, task_mock, top_up):
 
         user = Settings.create_user()
 
@@ -131,6 +134,15 @@ class TestAccountRegistation(BaseTestConfig):
         )
 
         self.assertEqual(response.text, self.menu.get("activate_accept"))
+
+        task_mock.schedule.assert_called_with(
+            owner=user,
+            description="Account Activation",
+            target_func=top_up,
+            queue=self.app.queue,
+            amount=self.app.config.get("ACTIVATION_AMOUNT"),
+            phonenumber=user.phonenumber
+        )
 
     def test_account_activation_rejected(self):
 
