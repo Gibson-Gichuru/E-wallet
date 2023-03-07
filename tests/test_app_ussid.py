@@ -141,7 +141,8 @@ class TestAccountRegistation(BaseTestConfig):
             target_func=top_up,
             queue=self.app.queue,
             amount=self.app.config.get("ACTIVATION_AMOUNT"),
-            phonenumber=user.phonenumber
+            phonenumber=user.phonenumber,
+            metadata={'purpose': 'activation'}
         )
 
     def test_account_activation_rejected(self):
