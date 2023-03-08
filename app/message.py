@@ -2,7 +2,6 @@ import os
 import africastalking
 import json
 from config import base_dir
-from dotenv import load_dotenv
 from app.afri_config import AfriBase
 
 

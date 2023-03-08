@@ -1,7 +1,5 @@
-import os
 from os import rename
 from config import base_dir
-from dotenv import load_dotenv
 from tempfile import NamedTemporaryFile
 import africastalking
 from app.afri_config import AfriBase
