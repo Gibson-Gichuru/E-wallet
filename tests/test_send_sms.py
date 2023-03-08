@@ -1,6 +1,6 @@
 from tests import BaseTestConfig
 from unittest import mock
-from app.message import send_sms
+from app.message import send_sms, Messanger
 import os
 
 
@@ -10,13 +10,14 @@ class TestSendSMS(BaseTestConfig):
 
         super().setUp()
 
+        self.messanger = Messanger()
+
         self.sender = os.environ.get("TALKING_SHORT_CODE")
 
-    @mock.patch("app.message.template_constructor", autospec=True)
-    @mock.patch("app.message.SMS", autospec=True)
-    def test_send_sms(self, sms_mock,temp_mock):
+    @mock.patch("app.message.Messanger", autospec=True)
+    def test_send_sms_interface(self,messanger_mock):
 
-        temp_mock.return_value = "testing"
+        messanger_mock.template_constructor.return_value = "testing"
 
         recipient = "test"
         
@@ -26,8 +27,10 @@ class TestSendSMS(BaseTestConfig):
             data=None
         )
 
-        sms_mock.send.assert_called_with(
-            temp_mock("TEST",data=None),
-            list(recipient),
-            self.sender
+        messanger_mock.assert_called()
+
+        messanger_mock().send_sms.assert_called_with(
+            template="TESTING",
+            recipient=recipient,
+            data=None
         )

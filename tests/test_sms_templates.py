@@ -1,5 +1,5 @@
 from tests import BaseTestConfig
-from app.message import template_constructor
+from app.message import Messanger
 from tests.settings import Settings
 import random
 import string
@@ -13,6 +13,8 @@ class TestSMSTemplates(BaseTestConfig):
 
         self.templates = Settings.get_sms_templates()
 
+        self.messanger = Messanger()
+
     def test_top_up_sms_template(self):
 
         sms_data = {
@@ -22,7 +24,7 @@ class TestSMSTemplates(BaseTestConfig):
             "balance":"test"
         }
         
-        sms = template_constructor("TOPUP", data=sms_data)
+        sms = self.messanger.template_constructor("TOPUP", data=sms_data)
 
         expected_template = lambda template, data: template.format(
             data.get("ref_no"),
@@ -43,7 +45,7 @@ class TestSMSTemplates(BaseTestConfig):
 
         data = {"balance":"test", "date":"test"}
 
-        sms = template_constructor("BALANCE", data=data)
+        sms = self.messanger.template_constructor("BALANCE", data=data)
 
         expected_template = lambda template, data: template.format(
             data.get("balance"),
@@ -60,9 +62,9 @@ class TestSMSTemplates(BaseTestConfig):
 
     def test_static_sms_template(self):
 
-        confirm_sms = template_constructor("CONFIRM", data=None)
-        activate_sms = template_constructor("ACTIVATE", data=None)
-        deactive_sms = template_constructor("DEACTIVATE", data=None)
+        confirm_sms = self.messanger.template_constructor("CONFIRM", data=None)
+        activate_sms = self.messanger.template_constructor("ACTIVATE", data=None)
+        deactive_sms = self.messanger.template_constructor("DEACTIVATE", data=None)
         
         self.assertEqual(
             confirm_sms,
@@ -106,7 +108,7 @@ class TestSMSTemplates(BaseTestConfig):
             balance=2
         )
 
-        sms = template_constructor("STATEMENT", data=data)
+        sms = self.messanger.template_constructor("STATEMENT", data=data)
 
         expected_template = lambda template, data: template.format(
             data.get("date"),
@@ -131,7 +133,7 @@ class TestSMSTemplates(BaseTestConfig):
             balance=20
         )
 
-        sms = template_constructor("WITHDRAW", data=data)
+        sms = self.messanger.template_constructor("WITHDRAW", data=data)
 
         expected_tempate = lambda template, data: template.format(
             data.get("debited_amount"),
