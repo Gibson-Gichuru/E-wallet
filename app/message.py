@@ -2,99 +2,99 @@ import os
 import africastalking
 import json
 from config import base_dir
-
-try:
-
-    africastalking.initialize(
-        username=os.environ.get("TALKING_USERNAME"),
-        api_key=os.environ.get("TALKING_API_KEY")
-    )
-
-except Exception as error:
-
-    pass
-
-SMS = africastalking.SMS
+from dotenv import load_dotenv
+from app.afri_config import AfriBase
 
 
-def get_templates():
+class Messanger(AfriBase):
 
-    with open(os.path.join(base_dir, "sms_template.json")) as file:
+    SENDER = os.environ.get("TALKING_SHORT_CODE")
 
-        templates = json.load(file)
+    def __init__(self) -> None:
+        
+        super().__init__()
 
-    return templates
+        self.sms = africastalking.SMS
 
+    def get_templates(self):
 
-def template_constructor(template_type, data):
+        with open(os.path.join(base_dir, "sms_template.json")) as file:
 
-    templates = get_templates()
+            templates = json.load(file)
 
-    if template_type == "TOPUP":
+        return templates
 
-        sms = lambda template, data: template.format(
-            data.get("ref_no"),
-            data.get("date"),
-            data.get("amount"),
-            data.get("balance")
+    def template_constructor(self, template_type, data):
+
+        templates = self.get_templates()
+
+        if template_type == "TOPUP":
+
+            sms = lambda template, data: template.format(
+                data.get("ref_no"),
+                data.get("date"),
+                data.get("amount"),
+                data.get("balance")
+            )
+
+            return sms(template=templates.get("TOPUP"),data=data)
+
+        if template_type == "BALANCE":
+
+            sms = lambda template, data: template.format(
+                data.get("balance"),
+                data.get("date")
+            )
+
+            return sms(template=templates.get("BALANCE"), data=data)
+
+        if template_type == "STATEMENT":
+
+            sms = lambda template, data: template.format(
+                data.get("date"),
+                data.get("records_str"),
+                data.get("cumulative_debit"),
+                data.get("balance")
+            )
+            return sms(template=templates.get("STATEMENT"), data=data)
+
+        if template_type == "WITHDRAW":
+
+            sms = lambda template, data: template.format(
+                data.get("debited_amount"),
+                data.get("ref_no"),
+                data.get("balance")
+            )
+
+            return sms(template=templates.get("WITHDRAW"), data=data)
+
+        if template_type == "CONFIRM":
+
+            return templates.get("CONFIRM")
+
+        if template_type == "ACTIVATE":
+
+            return templates.get("ACTIVATE")
+        
+        if template_type == "DEACTIVATE":
+
+            return templates.get("DEACTIVATE")
+
+    def send_sms(self, template, **kwargs):
+
+        data = kwargs.get("data")
+        recp = kwargs.get("recipient")
+
+        sms_message = self.template_constructor(
+            template_type=template,
+            data=data
         )
 
-        return sms(template=templates.get("TOPUP"),data=data)
-
-    if template_type == "BALANCE":
-
-        sms = lambda template, data: template.format(
-            data.get("balance"),
-            data.get("date")
-        )
-
-        return sms(template=templates.get("BALANCE"), data=data)
-
-    if template_type == "STATEMENT":
-
-        sms = lambda template, data: template.format(
-            data.get("date"),
-            data.get("records_str"),
-            data.get("cumulative_debit"),
-            data.get("balance")
-        )
-        return sms(template=templates.get("STATEMENT"), data=data)
-
-    if template_type == "WITHDRAW":
-
-        sms = lambda template, data: template.format(
-            data.get("debited_amount"),
-            data.get("ref_no"),
-            data.get("balance")
-        )
-
-        return sms(template=templates.get("WITHDRAW"), data=data)
-
-    if template_type == "CONFIRM":
-
-        return templates.get("CONFIRM")
-
-    if template_type == "ACTIVATE":
-
-        return templates.get("ACTIVATE")
-    
-    if template_type == "DEACTIVATE":
-
-        return templates.get("DEACTIVATE")
+        self.sms.send(sms_message,[recp],Messanger.SENDER)
 
 
-def send_sms(**kwargs):
+def send_sms(template, **kwargs):
 
-    temp = kwargs.get("template")
-    data = kwargs.get("data")
-    recp = kwargs.get("recipient")
+    messanger = Messanger()
 
-    sender = os.environ.get("TALKING_SHORT_CODE")
-
-    sms_message = template_constructor(template_type=temp,data=data)
-
-    if not sms_message or not SMS:
-
-        return
-
-    SMS.send(sms_message,list(recp),sender)
+    messanger.send_sms(template=template, **kwargs)

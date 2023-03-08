@@ -4,6 +4,7 @@ from config import base_dir
 from dotenv import load_dotenv
 from tempfile import NamedTemporaryFile
 import africastalking
+from app.afri_config import AfriBase
 
 
 class PaymentException(Exception):
@@ -13,25 +14,16 @@ class PaymentException(Exception):
         super().__init__(f"status: {status}: description: {message}")
 
 
-class Payments:
-
-    load_dotenv(os.path.join(base_dir,".env"))
-
-    USERNAME = os.environ.get("TALKING_USERNAME")
-
-    KEY = os.environ.get("TALKING_API_KEY")
+class Payments(AfriBase):
 
     PRODUCTNAME = "E-wallet"
 
     CURRENCY_CODE = "KES"
 
     def __init__(self) -> None:
-        
-        self.payment_gateway = africastalking.initialize(
-            username=Payments.USERNAME,
-            api_key=Payments.KEY
-        )
 
+        super().__init__()
+        
     def checkout(self, phonenumber,amount, metadata={}):
 
         amount = int(amount)
