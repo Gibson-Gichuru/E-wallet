@@ -58,6 +58,12 @@ class Config:
             "set",
             inject_app_obj(Account.balance_notify)
         )
+
+        event.listen(
+            Account.status_id,
+            "set",
+            inject_app_obj(Account.status_report_notify)
+        )
         
 
 class Development(Config):

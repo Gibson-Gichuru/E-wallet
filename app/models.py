@@ -144,7 +144,7 @@ class Account(db.Model, CrudOperations):
 
         for record in records:
 
-            record_str += f"{record.get('ref_no')} {record.get('amount')} {record.get('date')}"
+            record_str += f"{record.get('ref_no')} {record.get('amount')} {record.get('date')}\n"
 
         return record_str
 
@@ -213,13 +213,32 @@ class Account(db.Model, CrudOperations):
     @staticmethod
     def status_report_notify(target, value, oldvalue, initiator):
 
-        # Task.schedule(
-        #     owner=target.holder,
-        #     description="Account Status Change",
-        #     target_func=send_sms
-        # )
+        app = getattr(Account.status_report_notify, "_current_app")
 
-        pass
+        with app.app_context():
+
+            user = User.query.filter_by(
+                username=target.holder.username
+            ).first()
+
+            template = None
+
+            if target.can(Actions.DEACTIVATE):
+
+                template = "ACTIVATE"
+
+            if target.can(Actions.ACTIVATE):
+
+                template = "DEACTIVATE"
+
+            Task.schedule(
+                owner=user,
+                description="Account Status Change",
+                target_func=send_sms,
+                queue=app.queue,
+                template=template,
+                recipient=f"+{user.phonenumber}"
+            )
 
     def can(self, action):
 
