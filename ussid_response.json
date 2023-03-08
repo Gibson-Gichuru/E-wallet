@@ -4,7 +4,7 @@
     "activate":"CON Want to activate your account? \n 1. Yes \n 2. No",
     "activate_accept":"END request received. \n your will notified soon",
     "activate_reject":"END account not activated",
-    "main":"CON Main Menu. \n 1. Topup \n 2. Withdraw \n 3. Balance \n .4 Statement \n .5 Deactivate \n .6 Cancel",
+    "main":"CON Main Menu. \n 1. Topup \n 2. Withdraw \n 3. Balance \n 4. Statement \n 5. Deactivate \n 6. Cancel",
     "cancel":"END This is E-wallet. \n Good Bye",
     "reg_success":"END Account registered activation request has been sent \n please confirm the activaton fee by entering your mpesa pin",
     "suspended":"END sorry this account has been suspended",

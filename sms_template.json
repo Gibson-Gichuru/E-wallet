@@ -4,6 +4,6 @@
     "CONFIRM":"Your Account has been confirmed",
     "ACTIVATE":"Your Account has been activated, \n you can now use your E-wallet account.",
     "DEACTIVATE":"Your Account deactivation request have been processed. \n You can't access major services from your account \n You need to reactivate your account",
-    "STATEMENT":"Your Account Statement as at {} \n \t\t Records: \n{}, total Account transaction amount: {} Ksh \n Actual balance: {} Ksh",
+    "STATEMENT":"Your Account Statement as at {} \n \t\t Records: \n\n{}, total Account transaction amount: {} Ksh \n\n Actual balance: {} Ksh",
     "WITHDRAW":"Confirmed your account has been debited: Ksh {} \n Ref No: {}, \n Current Balance: {} \n Await a confirmation SMS from Mpesa"
 }
