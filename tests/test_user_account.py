@@ -1,7 +1,6 @@
 from tests import BaseTestConfig
 from app.models import Actions
 from tests.settings import Settings
-from unittest import skip
 
 
 class TestUser(BaseTestConfig):
@@ -41,8 +40,3 @@ class TestUser(BaseTestConfig):
         self.assertTrue(user.account.can(Actions.NOACTION))
 
         self.assertFalse(user.account.can(Actions.TRANSACT))
-
-    @skip("Not implemented yet")
-    def test_account_activation_stk_push(self):
-
-        pass
