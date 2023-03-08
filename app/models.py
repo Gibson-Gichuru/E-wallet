@@ -85,7 +85,7 @@ class User(db.Model, CrudOperations):
 
         send_sms(
             template="STATEMENT",
-            recipient="+" + recipient,
+            recipient=recipient,
             data=data
         )
 
@@ -127,7 +127,7 @@ class Account(db.Model, CrudOperations):
 
         return [
             dict(
-                ref_no=record.transaction_id,
+                ref_no=record.payment_id,
                 amount=record.amount,
                 date=datetime.strftime(
                     record.transaction_date,
@@ -192,12 +192,22 @@ class Account(db.Model, CrudOperations):
                 username=target.holder.username
             ).first()
 
+            data = {
+                "balance":user.account.balance.to_eng_string(),
+                "date":datetime.strftime(
+                    datetime.utcnow(),
+                    "%d/%m/%Y %H:%M:%S"
+                )
+            }
+
             Task.schedule(
                 owner=user,
                 description="Balance Notification",
                 target_func=send_sms,
                 queue=app.queue,
-                template="BALANCE"
+                template="BALANCE",
+                data=data,
+                recipient=f"+{user.phonenumber}"
             )
 
     @staticmethod
