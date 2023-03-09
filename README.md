@@ -74,7 +74,7 @@ The application is deployed to an AWS EC2 instance using a CI/CD pipeline with G
 
 When a user dials the USSD code, they are prompted to create an account by entering their username.
 
-<div style="display:flex; gap:2rem;">
+<div style="display:flex; gap:2rem; flex-wrap:wrap;">
   <img style="max-width:200px;" src="./screenshots/reg3.jpg"/>
   <img style="max-width:200px;" src="./screenshots/reg2.jpg"/>
   <img style="max-width:200px;" src="./screenshots/reg1.jpg"/>
@@ -85,7 +85,7 @@ When a user dials the USSD code, they are prompted to create an account by enter
 
 Users can top up their wallet by entering the amount they wish to add.
 
-<div style="display:flex; gap:2rem;">
+<div style="display:flex; gap:2rem; flex-wrap:wrap;">
   <img style="max-width:200px;" src="./screenshots/top1.jpg"/>
   <img style="max-width:200px;" src="./screenshots/top2.jpg"/>
   <img style="max-width:200px;" src="./screenshots/top3.jpg"/>
@@ -97,7 +97,7 @@ Users can top up their wallet by entering the amount they wish to add.
 
 Users can withdraw money from their wallet by entering the amount they wish to withdraw.
 
-<div style="display:flex; gap:2rem;">
+<div style="display:flex; gap:2rem; flex-wrap:wrap;">
   <img style="max-width:200px;" src="./screenshots/with1.jpg"/>
   <img style="max-width:200px;" src="./screenshots/with2.jpg"/>
   <img style="max-width:200px;" src="./screenshots/drw3.png"/>
@@ -107,7 +107,7 @@ Users can withdraw money from their wallet by entering the amount they wish to w
 
 Users can check their wallet balance by selecting the balance option from the menu.
 
-<div style="display:flex; gap:2rem;">
+<div style="display:flex; gap:2rem; flex-wrap:wrap;">
   <img style="max-width:200px;" src="./screenshots/balance1.jpg"/>
   <img style="max-width:200px;" src="./screenshots/balance.jpg"/>
   <img style="max-width:200px;" src="./screenshots/balance_sms.jpg"/>
@@ -116,7 +116,7 @@ Users can check their wallet balance by selecting the balance option from the me
 ### Request-Statement
 
 Users can request for their transaction statement by selecting the statement option from the menu.
-<div style="display:flex; gap:2rem;">
+<div style="display:flex; gap:2rem; flex-wrap:wrap;">
   <img style="max-width:200px;" src="./screenshots/stat1.jpg"/>
   <img style="max-width:200px;" src="/screenshots/stat2.jpg"/>
 </div>
@@ -124,7 +124,7 @@ Users can request for their transaction statement by selecting the statement opt
 ### Reactivate-Account
 
 Users can request for account reactivation
-<div style="display:flex; gap:2rem;">
+<div style="display:flex; gap:2rem; flex-wrap:wrap;">
   <img style="max-width:200px;" src="./screenshots/activate1.jpg"/>
   <img style="max-width:200px;" src="./screenshots/top3.jpg"/>
   <img style="max-width:200px;" src="./screenshots/activated_sms.jpg"/>
@@ -133,7 +133,7 @@ Users can request for account reactivation
 ### Deactivate-Account
 
 Users can request for account deactivation at will
-<div style="display:flex; gap:2rem;">
+<div style="display:flex; gap:2rem; flex-wrap:wrap;">
   <img style="max-width:200px;" src="./screenshots/deactivate.jpg"/>
   <img style="max-width:200px;" src="./screenshots/deactivated.jpg"/>
   <img style="max-width:200px;" src="./screenshots/deactivated_sms.jpg"/>
