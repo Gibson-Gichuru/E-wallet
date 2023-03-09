@@ -50,9 +50,19 @@ class User(db.Model, CrudOperations):
 
     username = db.Column(db.String(50), nullable=False, unique=True)
 
-    account = db.relationship("Account", uselist=False, back_populates="holder")
+    account = db.relationship(
+        "Account",
+        uselist=False,
+        back_populates="holder",
+        cascade="all, delete-orphan"
+    )
 
-    tasks = db.relationship("Task", backref="owner", lazy="dynamic")
+    tasks = db.relationship(
+        "Task",
+        backref="owner",
+        lazy="dynamic",
+        cascade="all, delete-orphan"
+    )
 
     def __init__(self, username, phonenumber) -> None:
         
@@ -111,7 +121,12 @@ class Account(db.Model, CrudOperations):
 
     holder = db.relationship("User", uselist=False, back_populates="account")
 
-    payments = db.relationship("Payment", backref="account", lazy="dynamic")
+    payments = db.relationship(
+        "Payment",
+        backref="account",
+        lazy="dynamic",
+        cascade="all, delete-orphan"
+    )
 
     def __init__(self) -> None:
         
