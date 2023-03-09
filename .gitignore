@@ -1,7 +1,6 @@
 env/
 __pycache__/
 .env
-design/
 .vscode/
 *.sqlite
 *.sqlite-*
