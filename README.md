@@ -4,11 +4,28 @@ This is a simple E-Wallet application that can be accessed via USSD interface. T
 
 ## Table of Contents
 
-- [Technologies](#Technologies)
-- [Features](#Features)
-- [Installation](#Installation)
-- [Testing](#Testing)
-- [interaction](#interaction)
+- [Technologies](#technologies)
+- [Features](#features)
+  - [Account-Creation](#account-creation)
+  - [Top-Up](#top-up)
+  - [Withdraw](#withdraw)
+  - [Check-Balance](#check-balance)
+  - [Request-Statement](#request-statement)
+  - [Reactivate-Account](#reactivate-account)
+  - [Deactivate-Account](#deactivate-account)
+- [Installation](#installation)
+- [Testing](#testing)
+- [Continuous-Integration-Continuous-Deployment](#continuous-integration-continuous-deployment)
+- [Application-Design](#application-design)
+  - [Database-Design](#database-design)
+  - [User-Registration-Sequence](#user-registration-sequence)
+  - [Account-Activation-Sequence](#account-activation-sequence)
+  - [Account-Deactivation-Sequence](#account-deactivation-sequence)
+  - [Account-Topup-Sequence](#account-topup-sequence)
+  - [Account-withdraw-Sequence](#account-withdraw-sequence)
+  - [Account-Balance-Request-Sequence](#account-balance-request-sequence)
+  - [Account-Statement-Request-Sequence](#account-statement-request-sequence)
+  - [User-Initiated-C2B-Topup-Sequence](#user-initiated-c2b-topup-sequence)
 - [License](#license)
 
 ## Technologies
@@ -47,68 +64,118 @@ To install and run the application, follow these steps:
 
 The application was developed using a test-driven approach, and tests are included in the `tests` folder. To run the tests, execute `poetry run flask test` from the command line.
 
-## Continuous Integration/Continuous Deployment
+## Continuous-Integration-Continuous-Deployment
 
 The application is deployed to an AWS EC2 instance using a CI/CD pipeline with GitHub Actions. The pipeline automatically tests and deploys the application whenever code is pushed to the `main` branch. The configuration for the pipeline can be found in the `.github/workflows/deploy.yml` file.
 
 ## How It Works
 
-### Account Creation
+### Account-Creation
 
-When a user dials the USSD code, they are prompted to create an account by entering their name and phone number.
+When a user dials the USSD code, they are prompted to create an account by entering their username.
 
-![Account Creation](screenshots/create_account.gif)
+<div style="display:flex; gap:2rem;">
+  <img style="max-width:200px;" src="./screenshots/reg3.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/reg2.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/reg1.jpg"/>
 
-### Top Up
+</div>
+
+### Top-Up
 
 Users can top up their wallet by entering the amount they wish to add.
 
-![Top Up](screenshots/top_up.gif)
+<div style="display:flex; gap:2rem;">
+  <img style="max-width:200px;" src="./screenshots/top1.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/top2.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/top3.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/top4.jpg"/>  
+
+</div>
 
 ### Withdraw
 
 Users can withdraw money from their wallet by entering the amount they wish to withdraw.
 
-![Withdraw](screenshots/withdraw.gif)
+<div style="display:flex; gap:2rem;">
+  <img style="max-width:200px;" src="./screenshots/with1.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/with2.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/drw3.png"/>
+</div>
 
-### Check Balance
+### Check-Balance
 
 Users can check their wallet balance by selecting the balance option from the menu.
 
-![Check Balance](screenshots/check_balance.gif)
+<div style="display:flex; gap:2rem;">
+  <img style="max-width:200px;" src="./screenshots/balance1.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/balance.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/balance_sms.jpg"/>
+</div>
 
-### Request Statement
+### Request-Statement
 
 Users can request for their transaction statement by selecting the statement option from the menu.
+<div style="display:flex; gap:2rem;">
+  <img style="max-width:200px;" src="./screenshots/stat1.jpg"/>
+  <img style="max-width:200px;" src="/screenshots/stat2.jpg"/>
+</div>
 
-![Request Statement](screenshots/request_statement.gif)
+### Reactivate-Account
 
-## Application Desing.
+Users can request for account reactivation
+<div style="display:flex; gap:2rem;">
+  <img style="max-width:200px;" src="./screenshots/activate1.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/top3.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/activated_sms.jpg"/>
+</div>
 
-### Database Design
-![database-design](design/db.png)
-### User Registration Sequence
-![register](design/register.png)
-### Account Activation Sequence
-![register](design/activate.png)
+### Deactivate-Account
 
-### Account Deactivation Sequence
-![deactivate](design/deactivation.png)
+Users can request for account deactivation at will
+<div style="display:flex; gap:2rem;">
+  <img style="max-width:200px;" src="./screenshots/deactivate.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/deactivated.jpg"/>
+  <img style="max-width:200px;" src="./screenshots/deactivated_sms.jpg"/>
+</div>
 
-### Account Topup Sequence
-![register](design/topup.png)
+## Application-Design
 
-### Account withdraw Sequence
-![register](design/withdraw.png)
+### Database-Design
+<!-- ![database-design](design/db.png) -->
+<img width="400" style="max-width:100%;" src="./design/db.png"/>
 
-### Account Balance Request Sequence
-![register](design/balance.png)
+### User-Registration-Sequence
+<!-- ![register](design/register.png) -->
+<img width="400" style="max-width:100%;" src="./design/register.png"/>
 
-### Account Statement Request Sequence
-![register](design/statement.png)
+### Account-Activation-Sequence
+<!-- ![register](design/activate.png) -->
+<img width="400" style="max-width:100%;" src="./design/activate.png"/>
 
-### User Initiated C2B Topup Sequence
-![register](design/c2b.png)
+### Account-Deactivation-Sequence
+<!-- ![deactivate](design/deactivation.png) -->
+<img width="400" style="max-width:100%;" src="./design/deactivation.png"/>
+
+### Account-Topup-Sequence
+<!-- ![register](design/topup.png) -->
+<img width="400" style="max-width:100%;" src="./design/topup.png"/>
+
+### Account-withdraw-Sequence
+<!-- ![register](design/withdraw.png) -->
+<img width="400" style="max-width:100%;" src="./design/withdraw.png"/>
+
+### Account-Balance-Request-Sequence
+<!-- ![register](design/balance.png) -->
+<img width="400" style="max-width:100%;" src="./design/balance.png"/>
+
+### Account-Statement-Request-Sequence
+<!-- ![register](design/statement.png) -->
+<img width="400" style="max-width:100%;" src="./design/statement.png"/>
+
+### User-Initiated-C2B-Topup-Sequence
+<!-- ![register](design/c2b.png) -->
+<img width="400" style="max-width:100%;" src="./design/c2b.png"/>
 
 ## License
 
