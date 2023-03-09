@@ -236,24 +236,26 @@ class Account(db.Model, CrudOperations):
                 username=target.holder.username
             ).first()
 
-            template = None
+            if user:
 
-            if target.can(Actions.DEACTIVATE):
+                template = None
 
-                template = "ACTIVATE"
+                if target.can(Actions.DEACTIVATE):
 
-            if target.can(Actions.ACTIVATE):
+                    template = "ACTIVATE"
 
-                template = "DEACTIVATE"
+                if target.can(Actions.ACTIVATE):
 
-            Task.schedule(
-                owner=user,
-                description="Account Status Change",
-                target_func=send_sms,
-                queue=app.queue,
-                template=template,
-                recipient=f"+{user.phonenumber}"
-            )
+                    template = "DEACTIVATE"
+
+                Task.schedule(
+                    owner=user,
+                    description="Account Status Change",
+                    target_func=send_sms,
+                    queue=app.queue,
+                    template=template,
+                    recipient=f"+{user.phonenumber}"
+                )
 
     def can(self, action):
 
