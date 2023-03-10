@@ -45,8 +45,8 @@ def create_app(app_config: str) -> Flask:
 
     from app.payments import payment_blueprint
 
-    app.register_blueprint(ussid_blueprint)
+    app.register_blueprint(ussid_blueprint, url_prefix="/ussid")
 
-    app.register_blueprint(payment_blueprint)
+    app.register_blueprint(payment_blueprint, url_prefix="/payment")
 
     return app
