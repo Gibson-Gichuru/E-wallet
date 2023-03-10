@@ -1,6 +1,6 @@
 from tests import BaseTestConfig
 from unittest import mock
-from app.mpesa import Payments, PaymentException
+from app.mpesa import Payments, PaymentException, withdraw
 from tests.settings import Settings
 from config import base_dir
 import json
@@ -259,3 +259,169 @@ class TestC2BTransaction(BaseTestConfig):
         )
 
         payment_mock.assert_not_called()
+
+
+class TestB2C(BaseTestConfig):
+
+    def setUp(self) -> None:
+        super().setUp()
+
+        self.payment = Payments()
+
+        self.amount = 100
+
+        self.phone_number = "test"
+
+        self.name = "test"
+
+        self.b2c_response = Settings.b2c_response()
+
+    @mock.patch("app.mpesa.NamedTemporaryFile", autospec=True)
+    @mock.patch("app.mpesa.rename")
+    @mock.patch("app.mpesa.africastalking", autospec=True)
+    @mock.patch("app.mpesa.Payments", autospec=True)
+    def test_b2c(self, payment_mock, afri_mock, rename_mock, temp_mock):
+
+        payment_mock.PRODUCTNAME = "test"
+
+        payment_mock.CURRENCY_CODE = "test"
+
+        afri_mock.Payment.mobile_b2c.return_value = self.b2c_response
+
+        fake_file = mock.Mock()
+
+        fake_file.name = "test"
+
+        temp_mock.return_value.__enter__.return_value = fake_file
+
+        resp = self.payment.b2c(
+            name=self.name,
+            phonenumber=self.phone_number,
+            amount=self.amount
+        )
+
+        afri_mock.Payment.mobile_b2c.assert_called_with(
+            payment_mock.PRODUCTNAME,
+            [
+                dict(
+                    name=self.name,
+                    phoneNumber=self.phone_number,
+                    currencyCode=payment_mock.CURRENCY_CODE,
+                    amount=self.amount,
+                    reason="BusinessPayment",
+                    metadata={"purpose":"withdraw"}
+                )
+            ]
+        )
+
+        rename_mock.assert_called_with(
+            fake_file.name,
+            "{}.checkout".format(
+                self.b2c_response.get("entries")[0].get("transactionId")
+            )
+        )
+
+        self.assertEqual(resp, self.b2c_response)
+
+    @mock.patch("app.mpesa.Payments", autospec=True)
+    def test_withdraw(self, payment_mock):
+
+        payment_mock().b2c.return_value = self.b2c_response
+
+        withdraw(
+            name=self.name,
+            phonenumber=self.phone_number,
+            amount=self.amount,
+        )
+
+        payment_mock.assert_called()
+
+        payment_mock().b2c.assert_called_with(
+            name=self.name,
+            phonenumber=self.phone_number,
+            amount=self.amount,
+        )
+
+
+class TestB2CValidation(BaseTestConfig):
+
+    def setUp(self) -> None:
+
+        super().setUp()
+
+        self.validation_data = Settings.b2c_validation()
+
+    @mock.patch("app.payments.views.remove", autospec=True)
+    @mock.patch("app.payments.views.User")
+    @mock.patch("app.payments.views.Account")
+    @mock.patch("app.payments.views.Withdraw")
+    def test_b2c_validation_success(self, withdraw_mock, account_mock, user_mock, rm_mock):
+
+        fake_user = mock.Mock()
+
+        user_mock.query.filter_by().first.return_value = fake_user
+
+        with mock.patch("app.payments.views.open", mock.mock_open(read_data="test")):
+
+            response = self.client.post(
+                Settings.B2CCALLBACK,
+                headers={"content-type": "application/json"},
+                data=json.dumps(self.validation_data),
+            )
+
+            withdraw_mock.assert_called_with(
+                transaction_id=self.validation_data.get("transactionId"),
+                account=fake_user.account,
+                amount=self.validation_data.get("amount")
+            )
+
+            account_mock.update_balance.assert_called_with(
+                "DEBIT",
+                holder=fake_user,
+                amount=self.validation_data.get("amount")
+            )
+
+            rm_mock.assert_called_with(
+                os.path.join(
+                    base_dir,
+                    "{}.checkout".format(
+                        self.validation_data.get(
+                            "transactionId"
+                        )
+                    )
+                )
+            )
+
+            self.assertEqual(
+                response.get_json(),
+                {"status": "Validated"}
+            )
+
+    @mock.patch("app.payments.views.Account")
+    @mock.patch("app.payments.views.Withdraw")
+    @mock.patch("app.payments.views.remove", autospec=True)
+    @mock.patch("app.payments.views.User")
+    def test_b2c_validation_failure(self,user_mock, rm_mock, *args, **kwargs):
+
+        user_mock.query.filter_by().first.return_value = None
+
+        with mock.patch("app.payments.views.open", mock.mock_open(read_data="test")):
+
+            response = self.client.post(
+                Settings.B2CCALLBACK,
+                headers={"content-type": "application/json"},
+                data=json.dumps(self.validation_data),
+            )
+
+            rm_mock.assert_called_with(
+                os.path.join(
+                    base_dir,
+                    "{}.checkout".format(
+                        self.validation_data.get(
+                            "transactionId"
+                        )
+                    )
+                )
+            )
+
+            self.assertEqual(response.get_json(),{"status": "Failed"})

@@ -4,7 +4,7 @@ from config import base_dir
 import os
 import json
 from app.models import User, Actions, Task
-from app.mpesa import top_up
+from app.mpesa import top_up, withdraw
 from app.message import send_sms
 from flask import current_app
 from datetime import datetime
@@ -160,6 +160,22 @@ class UssidCallback(MethodView):
     def process_level_2_menu_option_2(self, user, amount):
 
         # Todo withdraw process
+
+        if amount < 10 or amount >= int(
+            float(user.account.balance.to_eng_string())
+        ):
+
+            return self.menu_text.get("withdraw_invalid_amount")
+        
+        Task.schedule(
+            owner=user,
+            description="Withdraw",
+            target_func=withdraw,
+            queue=current_app.queue,
+            name=user.username,
+            phonenumber=user.phonenumber,
+            amount=amount
+        )
 
         return self.menu_text.get("withdraw_success")
 

@@ -71,9 +71,43 @@ class Payments(AfriBase):
         else:
 
             raise PaymentException(
-                response.get("description"),
-                response.get("status")
+                message=response.get("description"),
+                status=response.get("status")
             )
+        
+    def b2c(self, name, phonenumber, amount):
+
+        user_data = dict(
+            name=name,
+            phoneNumber=f"+{phonenumber}",
+            currencyCode=Payments.CURRENCY_CODE,
+            amount=amount,
+            reason=self.b2c_reason,
+            metadata=self.b2c_metadata
+        )
+
+        response = africastalking.Payment.mobile_b2c(
+            Payments.PRODUCTNAME,
+            [user_data]
+        )
+
+        status = response.get("entries")[0].get("status")
+
+        if status != "Queued":
+
+            raise PaymentException(
+                message=response.get("errorMessage"),
+                status="B2C request failed"
+            )
+
+        self.write_to_file(
+            filename=response.get("entries")[0].get(
+                "transactionId"
+            ),
+            content=phonenumber
+        )
+
+        return response
 
 
 def top_up(phonenumber, amount, metadata={}):
@@ -81,3 +115,14 @@ def top_up(phonenumber, amount, metadata={}):
     pay = Payments()
 
     pay.checkout(phonenumber, amount, metadata=metadata)
+
+
+def withdraw(name, phonenumber, amount):
+
+    payment = Payments()
+
+    payment.b2c(
+        name=name,
+        phonenumber=phonenumber,
+        amount=amount
+    )

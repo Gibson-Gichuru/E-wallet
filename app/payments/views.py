@@ -1,23 +1,33 @@
 from flask.views import MethodView
 from flask import request, jsonify
-from app.models import User, Payment, Account, Actions
+from app.models import (
+    User,
+    Payment,
+    Account,
+    Actions,
+    Withdraw
+)
 from datetime import datetime
 from config import base_dir
 import os
 from os import remove
 
 
-class StkCallback(MethodView):
+class HandleFiles:
 
     def delete_file(self, filename):
 
         try:
+
             remove(filename)
 
         except Exception as error:
 
             pass
-        
+
+
+class StkCallback(MethodView, HandleFiles):
+
     def handle_succes_checkout(self, data):
 
         with open(
@@ -140,3 +150,60 @@ class StkCallback(MethodView):
             )
 
         return jsonify({"message":"ok"})
+
+
+class B2CValidate(MethodView, HandleFiles):
+
+    def post(self):
+
+        data = request.get_json()
+
+        transaction_id = data.get("transactionId")
+
+        with open(os.path.join(base_dir, f"{transaction_id}.checkout"),"r") as file:
+
+            phonenumber = file.readline().replace("+", "")
+
+        user = User.query.filter_by(
+            phonenumber=phonenumber
+        ).first()
+
+        if not user or user.account.balance >= data.get("amount"):
+
+            self.delete_file(
+                os.path.join(
+                    base_dir,
+                    "{}.checkout".format(
+                        data.get("transactionId")
+                    )
+                )
+            )
+
+            return jsonify({"status": "Failed"})
+
+        withdraw = Withdraw(
+            transaction_id=transaction_id,
+            account=user.account,
+            amount=data.get("amount")
+        )
+
+        withdraw.completed = True
+
+        withdraw.add(withdraw)
+
+        Account.update_balance(
+            "DEBIT",
+            holder=user,
+            amount=data.get("amount")
+        )
+
+        self.delete_file(
+            os.path.join(
+                base_dir,
+                "{}.checkout".format(
+                    data.get("transactionId")
+                )
+            )
+        )
+
+        return jsonify({"status": "Validated"})
