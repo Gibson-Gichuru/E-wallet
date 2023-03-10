@@ -128,6 +128,13 @@ class Account(db.Model, CrudOperations):
         cascade="all, delete-orphan"
     )
 
+    withdraws = db.relationship(
+        "Withdraw",
+        backref="account",
+        lazy="dynamic",
+        cascade="all, delete-orphan"
+    )
+
     def __init__(self) -> None:
         
         default_status = Status.query.filter_by(
@@ -314,6 +321,43 @@ class Payment(db.Model, CrudOperations):
             self.transaction_id,
             self.amount,
             self.transaction_date
+        )
+
+
+class Withdraw(db.Model, CrudOperations):
+
+    __tablename__ = "withdraw"
+
+    withdraw_id = db.Column(db.Integer, primary_key=True)
+
+    transaction_id = db.Column(db.String(50), unique=True, nullable=False)
+
+    account_id = db.Column(db.Integer, db.ForeignKey("account.account_id"), nullable=False)
+
+    amount = db.Column(db.Numeric(5,2), nullable=False)
+
+    timestamp = db.Column(db.DateTime, default=datetime.utcnow)
+
+    completed = db.Column(db.Boolean, default=False)
+
+    def __init__(self, transaction_id, account, amount) -> None:
+        
+        self.transaction_id = transaction_id
+
+        self.account = account
+
+        self.amount = amount
+
+    def __repr__(self) -> str:
+
+        return "{} withdrew {} on {} status: {}".format(
+            self.account.holder.username,
+            self.amount,
+            datetime.strptime(
+                self.timestamp,
+                "%Y-%m-%d %H:%M:%S"
+            ),
+            "Completed" if self.completed else "Failed"
         )
 
 
