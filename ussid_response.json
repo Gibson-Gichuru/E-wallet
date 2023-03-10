@@ -16,5 +16,6 @@
     "invalid":"END Invalid option",
     "topup_success":"END A Transaction request have been made to your phone \n Confirm it by entering your mpesa pin",
     "withdraw_success":"END Request received you will get a confirmation message soon",
+    "withdraw_invalid_amount":"END Invalid amount",
     "withdraw":"CON Enter the amount you would like to withdraw"
 }
