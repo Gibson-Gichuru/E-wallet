@@ -1,0 +1,16 @@
+{
+    "entries": [
+        {
+            "phoneNumber": "test",
+            "provider": "Athena",
+            "providerChannel": "525900",
+            "status": "Queued",
+            "transactionFee": "KES 1.0000",
+            "transactionId": "test",
+            "value": "KES 100.0000"
+        }
+    ],
+    "numQueued": 1,
+    "totalTransactionFee": "KES 1.0000",
+    "totalValue": "KES 100.0000"
+}

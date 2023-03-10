@@ -8,6 +8,7 @@ class Settings:
 
     ENDPOINT = "/ussid/callback"
     STKCALLBACK = "/payment/stkcallback"
+    B2CCALLBACK = "/payment/b2c/validation"
 
     @staticmethod
     def create_user(active=False, suspended=False):
@@ -79,3 +80,27 @@ class Settings:
             return response.get("c2b_success")
         
         return response.get("success")
+    
+    @staticmethod
+    def b2c_response():
+
+        with open(os.path.join(base_dir, "tests/b2c-response.json"), "r") as file:
+
+            response = json.load(file)
+
+        return response
+
+    @staticmethod
+    def b2c_validation():
+
+        data = {
+            'phoneNumber': 'test',
+            'amount': 100,
+            'currencyCode': 'KES',
+            'metadata': {
+                'purpose': 'withdraw'
+                },
+            'transactionId': 'test'
+        }
+
+        return data
