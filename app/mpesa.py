@@ -21,10 +21,28 @@ class Payments(AfriBase):
     def __init__(self) -> None:
 
         super().__init__()
+
+        self.b2c_reason = "BusinessPayment"
+
+        self.b2c_metadata = {"purpose":"withdraw"}
+
+    def write_to_file(self, filename, content):
+
+        with NamedTemporaryFile(delete=False, dir=base_dir) as file:
+
+            file.write(content.encode('utf-8'))
+
+            rename(
+                file.name,
+                "{}.checkout".format(
+                    filename
+                )
+            )
         
     def checkout(self, phonenumber,amount, metadata={}):
 
         amount = int(amount)
+
         if amount < 10:
 
             raise ValueError("Invalid Amount")
