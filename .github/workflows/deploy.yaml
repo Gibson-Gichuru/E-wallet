@@ -50,9 +50,9 @@ jobs:
 
           poetry add flake8
 
-          flake8 . --count --select E9,F63,F7,F82 --exclude __pycache__ --show-source --statistics
+          poetry run flake8 . --count --select E9,F63,F7,F82 --exclude __pycache__ --show-source --statistics
 
-          flake8 . --count --max-complexity=10 --max-line-length=100 --ignore C901,E121,E122,E221,E126,E231,E123,E731,F841,W503,W293,W504 --exclude __pycache__,migrations,env --show-source --statistics
+          poetry run flake8 . --count --max-complexity=10 --max-line-length=100 --ignore C901,E121,E122,E221,E126,E231,E123,E731,F841,W503,W293,W504 --exclude __pycache__,migrations,env --show-source --statistics
 
   Deploy:
 
