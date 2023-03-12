@@ -2,7 +2,7 @@ upstream application {
 
     least_conn;
 
-    server http://unix:/run/e-wallet/e-wallet.sock;
+    server unix:/run/e-wallet/e-wallet.sock;
 
     keepalive 32;
 }
