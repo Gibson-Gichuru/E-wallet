@@ -305,7 +305,7 @@ class TestB2C(BaseTestConfig):
             [
                 dict(
                     name=self.name,
-                    phoneNumber=self.phone_number,
+                    phoneNumber=f"+{self.phone_number}",
                     currencyCode=payment_mock.CURRENCY_CODE,
                     amount=self.amount,
                     reason="BusinessPayment",
@@ -358,6 +358,8 @@ class TestB2CValidation(BaseTestConfig):
     def test_b2c_validation_success(self, withdraw_mock, account_mock, user_mock, rm_mock):
 
         fake_user = mock.Mock()
+
+        fake_user.account.balance.to_eng_string.return_value = "1000.00"
 
         user_mock.query.filter_by().first.return_value = fake_user
 
