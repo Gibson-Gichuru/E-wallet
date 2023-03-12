@@ -36,7 +36,7 @@ def configure_nginx():
     subprocess.run(
         copy_command.format(
             "sudo ln -sf",
-            "/etc/nginx/sites-available/e-wallet",
+            "/etc/nginx/sites-available/e-wallet.conf",
             NGINX_SYMLINK_DIR
         ),
         check=True
