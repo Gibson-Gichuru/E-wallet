@@ -1,3 +1,12 @@
+upstream application {
+
+    least_conn;
+
+    server http://unix:/run/e-wallet/e-wallet.sock;
+
+    keepalive 32;
+}
+
 server {
 
     listen 80 default_server;
@@ -24,13 +33,5 @@ server {
         proxy_pass http://application;
     }
 
-    upstream application {
-
-        least_conn;
-
-        server http://unix:/run/e-wallet/e-wallet.sock;
-
-        keepalive 32;
-    }
 
 }
