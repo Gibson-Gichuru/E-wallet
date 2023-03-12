@@ -2,6 +2,7 @@ import subprocess
 from . import logging
 from . import poetry_env
 
+
 def database_migrate():
 
     logging.info("Comparing database migration")
