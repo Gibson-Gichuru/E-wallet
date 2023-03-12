@@ -7,8 +7,8 @@ User=ubuntu
 Group=ubuntu
 RuntimeDirectory=e-wallet
 WorkingDirectory=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet
-Environment="PATH=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet/env/bin"
-ExecStart=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet/env/bin/rq worker E-wallet --with-scheduler --name e-wallet --url unix:///run/redis/redis-server.sock
-ExecStop=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet/env/bin/flask stop-redis-worker
+Environment="PATH=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet"
+ExecStart=poetry run rq worker E-wallet --with-scheduler -c settings
+ExecStop=poerty run flask stop-redis-worker
 [Install]
 WantedBy=multi-user.target
