@@ -97,18 +97,25 @@ class TransactionTests(BaseTestConfig):
             self.menu.get("statement")
         )
 
+    @mock.patch("app.ussid.views.User")
     @mock.patch("app.ussid.views.withdraw", autospec=True)
     @mock.patch("app.ussid.views.Task", autospec=True)
-    def test_withdraw(self, task_mock, withdraw_mock):
+    def test_withdraw(self, task_mock, withdraw_mock, user_mock):
+
+        fake_user = mock.Mock()
+
+        fake_user.account.balance.to_eng_string.return_value = "1000.0"
+
+        user_mock.query.filter_by().first.return_value = fake_user
 
         self.transact("2*100")
 
         task_mock.schedule.assert_called_with(
-            owner=self.user,
+            owner=fake_user,
             description="Withdraw",
             target_func=withdraw_mock,
             queue=self.app.queue,
-            name=self.user.username,
-            phonenumber=self.user.phonenumber,
+            name=fake_user.username,
+            phonenumber=fake_user.phonenumber,
             amount=100
         )

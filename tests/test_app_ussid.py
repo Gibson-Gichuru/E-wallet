@@ -94,7 +94,7 @@ class TestAccountRegistation(BaseTestConfig):
 
         self.assertIsNotNone(user)
 
-    def test_account_activation(self):
+    def test_unactivated_account_ussid_response(self):
 
         user = Settings.create_user()
 
@@ -158,7 +158,12 @@ class TestAccountRegistation(BaseTestConfig):
 
         self.assertEqual(response.text, self.menu.get("activate_reject"))
 
-    def test_account_deactivaton(self):
+    @mock.patch("app.ussid.views.User")
+    def test_account_deactivaton(self, user_mock):
+
+        fake_user = mock.Mock()
+
+        user_mock.query.filter_by().first.return_value = fake_user
 
         user = Settings.create_user(active=True)
 
@@ -169,11 +174,7 @@ class TestAccountRegistation(BaseTestConfig):
             data=Settings.make_request_body(text="5")
         )
 
-        updated_user = User.query.filter_by(
-            username=user.username
-        ).first()
-
-        self.assertTrue(updated_user.account.status.default)
+        fake_user.account.deactivate.assert_called()
 
         self.assertEqual(
             response.text,
