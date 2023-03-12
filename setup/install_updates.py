@@ -1,5 +1,5 @@
 import subprocess
-from setup import poetry_env
+from . import poetry_env
 
 
 def install_updates():
