@@ -24,23 +24,23 @@ jobs:
 
         uses: actions/setup-python@v2
 
+      - name: setting up poetry
+
+        uses: abatilo/actions-poetry@v2
+
       - name : Installing Dependencies
 
-        run: |
-
-          python - m pip install --upgrade pip
-
-          pip install -r requirements.txt
+        run: poetry install
 
       - name: Testing the Application
 
-        run: flask test
+        run: poetry run flask test
 
       - name: Linting the Source code
 
         run: |
 
-          pip install flake8
+          poetry add flake8
 
           flake8 . --count --select E9,F63,F7,F82 --exclude __pycache__ --show-source --statistics
 
