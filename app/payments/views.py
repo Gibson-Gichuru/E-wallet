@@ -168,7 +168,9 @@ class B2CValidate(MethodView, HandleFiles):
             phonenumber=phonenumber
         ).first()
 
-        if not user or user.account.balance >= data.get("amount"):
+        if not user or int(float(
+            user.account.balance.to_eng_string()
+        )) <= data.get("amount"):
 
             self.delete_file(
                 os.path.join(
