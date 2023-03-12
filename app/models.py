@@ -86,7 +86,10 @@ class User(db.Model, CrudOperations):
         sms_format = Account.sms_statement_format(records=records)
 
         data = {
-            "date":datetime.utcnow(),
+            "date":datetime.strftime(
+                datetime.utcnow(),
+                "%Y-%m-%d %H:%M:%S"
+            ),
             "records_str":sms_format,
             "cumulative_debit":cumulative_debit,
             "cumulative_credit":cumulative_credit,
@@ -166,7 +169,11 @@ class Account(db.Model, CrudOperations):
 
         for record in records:
 
-            record_str += f"{record.get('ref_no')} {record.get('amount')} {record.get('date')}\n"
+            record_str += "{}: Ksh: {} at {}\n".format(
+                record.get('ref_no'),
+                record.get('amount'),
+                record.get('date')
+            )
 
         return record_str
 

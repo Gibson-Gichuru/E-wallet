@@ -53,6 +53,7 @@ class Messanger(AfriBase):
                 data.get("date"),
                 data.get("records_str"),
                 data.get("cumulative_debit"),
+                data.get("cumulative_credit"),
                 data.get("balance")
             )
             return sms(template=templates.get("STATEMENT"), data=data)
