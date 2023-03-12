@@ -30,7 +30,7 @@ jobs:
 
       - name : Installing Dependencies
 
-        run: poetry install
+        run: poetry install --no-root
 
       - name: Testing the Application
 
