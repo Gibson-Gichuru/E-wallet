@@ -1,6 +1,5 @@
 import os
 import subprocess
-from config import base_dir
 from . import logging
 
 
@@ -8,18 +7,16 @@ def database_migrate():
 
     logging.info("Comparing database migration")
 
-    flask_dir = os.path.join(base_dir, "env/bin/flask")
-
-    command = "{} db {}"
+    command = "poetry run flask db {}"
 
     current_version = subprocess.run(
-        command.format(flask_dir, "current").split(),
+        command.format("current").split(),
         capture_output=True,
         encoding="utf-8"
     ).stdout.split()
 
     migration_schema_version = subprocess.run(
-        command.format(flask_dir, "heads").split(),
+        command.format("heads").split(),
         capture_output=True,
         encoding="utf-8"
     ).stdout.split()
@@ -27,7 +24,7 @@ def database_migrate():
     if not current_version:
 
         subprocess.run(
-            command.format(flask_dir, "upgrade").split()
+            command.format("upgrade").split()
         )
 
     if current_version != migration_schema_version:
@@ -35,7 +32,7 @@ def database_migrate():
         logging.info("Running database migrations")
 
         subprocess.run(
-            command.format(flask_dir, "upgrade").split()
+            command.format("upgrade").split()
         )
 
     logging.info("Database uptodate")
