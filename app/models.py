@@ -74,6 +74,8 @@ class User(db.Model, CrudOperations):
 
         self.account  = Account()
 
+        db.session.add(self.account)
+
     @staticmethod
     def account_statement(*args, **kwargs):
 
