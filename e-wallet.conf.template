@@ -1,20 +1,36 @@
 server {
 
-    listen ${PORT};
-    server_name ${SERVER_NAME};
+    listen 80 default_server;
+
+    listen [::]:80 default_server;
+
+    include proxy_params;
+
+    server_name _;
 
     location / {
 
         deny all;
-
         
     }
 
-    location /ussid/callback {
-        include proxy_params;
+    location ^~ /payment {
 
-        # proxy pass to a unix socket
-
-        proxy_pass http://unix:/run/e-wallet/e-wallet.sock;
+        proxy_pass http://application;
     }
+
+    location ^~ /ussid {
+
+        proxy_pass http://application;
+    }
+
+    upstream application {
+
+        least_conn;
+
+        server http://unix:/run/e-wallet/e-wallet.sock;
+
+        keepalive 32;
+    }
+
 }
