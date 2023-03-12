@@ -160,9 +160,9 @@ environment interfaces with the reverse proxy via a unix socket file
 When a user dials the USSD code, they are prompted to create an account by entering their username.
 
 <div style="display:flex; gap:2rem; flex-wrap:wrap;">
-  <img style="width:100px;" src="./screenshots/reg3.jpg"/>
-  <img style="width:100px;" src="./screenshots/reg2.jpg"/>
-  <img style="width:100px;" src="./screenshots/reg1.jpg"/>
+  <img style="width:200px;" src="./screenshots/reg3.jpg"/>
+  <img style="width:200px;" src="./screenshots/reg2.jpg"/>
+  <img style="width:200px;" src="./screenshots/reg1.jpg"/>
 
 </div>
 
@@ -171,10 +171,10 @@ When a user dials the USSD code, they are prompted to create an account by enter
 Users can top up their wallet by entering the amount they wish to add.
 
 <div style="display:flex; gap:2rem; flex-wrap:wrap;">
-  <img style="width:100px;" src="./screenshots/top1.jpg"/>
-  <img style="width:100px;" src="./screenshots/top2.jpg"/>
-  <img style="width:100px;" src="./screenshots/top3.jpg"/>
-  <img style="width:100px;" src="./screenshots/top4.jpg"/>  
+  <img style="width:200px;" src="./screenshots/top1.jpg"/>
+  <img style="width:200px;" src="./screenshots/top2.jpg"/>
+  <img style="width:200px;" src="./screenshots/top3.jpg"/>
+  <img style="width:200px;" src="./screenshots/top4.jpg"/>  
 
 </div>
 
@@ -183,9 +183,9 @@ Users can top up their wallet by entering the amount they wish to add.
 Users can withdraw money from their wallet by entering the amount they wish to withdraw.
 
 <div style="display:flex; gap:2rem; flex-wrap:wrap;">
-  <img style="width:100px;" src="./screenshots/with1.jpg"/>
-  <img style="width:100px;" src="./screenshots/with2.jpg"/>
-  <img style="width:100px;" src="./screenshots/with3.jpg"/>
+  <img style="width:200px;" src="./screenshots/with1.jpg"/>
+  <img style="width:200px;" src="./screenshots/with2.jpg"/>
+  <img style="width:200px;" src="./screenshots/with3.jpg"/>
 </div>
 
 ### Check-Balance
@@ -193,35 +193,35 @@ Users can withdraw money from their wallet by entering the amount they wish to w
 Users can check their wallet balance by selecting the balance option from the menu.
 
 <div style="display:flex; gap:2rem; flex-wrap:wrap;">
-  <img style="width:100px;" src="./screenshots/balance1.jpg"/>
-  <img style="width:100px;" src="./screenshots/balance.jpg"/>
-  <img style="width:100px;" src="./screenshots/balance_sms.jpg"/>
+  <img style="width:200px;" src="./screenshots/balance1.jpg"/>
+  <img style="width:200px;" src="./screenshots/balance.jpg"/>
+  <img style="width:200px;" src="./screenshots/balance_sms.jpg"/>
 </div>
 
 ### Request-Statement
 
 Users can request for their transaction statement by selecting the statement option from the menu.
 <div style="display:flex; gap:2rem; flex-wrap:wrap;">
-  <img style="width:100px;" src="./screenshots/stat1.jpg"/>
-  <img style="width:100px;" src="./screenshots/stat2.jpg"/>
+  <img style="width:200px;" src="./screenshots/stat1.jpg"/>
+  <img style="width:200px;" src="./screenshots/stat2.jpg"/>
 </div>
 
 ### Reactivate-Account
 
 Users can request for account reactivation
 <div style="display:flex; gap:2rem; flex-wrap:wrap;">
-  <img style="width:100px;" src="./screenshots/activate1.jpg"/>
-  <img style="width:100px;" src="./screenshots/top3.jpg"/>
-  <img style="width:100px;" src="./screenshots/activated_sms.jpg"/>
+  <img style="width:200px;" src="./screenshots/activate1.jpg"/>
+  <img style="width:200px;" src="./screenshots/top3.jpg"/>
+  <img style="width:200px;" src="./screenshots/activated_sms.jpg"/>
 </div>
 
 ### Deactivate-Account
 
 Users can request for account deactivation at will
 <div style="display:flex; gap:2rem; flex-wrap:wrap;">
-  <img style="width:100px;" src="./screenshots/deactivate.jpg"/>
-  <img style="width:100px;" src="./screenshots/deactivated.jpg"/>
-  <img style="width:100px;" src="./screenshots/deactivated_sms.jpg"/>
+  <img style="width:200px;" src="./screenshots/deactivate.jpg"/>
+  <img style="width:200px;" src="./screenshots/deactivated.jpg"/>
+  <img style="width:200px;" src="./screenshots/deactivated_sms.jpg"/>
 </div>
 
 ## Application-Design
