@@ -8,6 +8,14 @@ on:
 
       - main
 
+env:
+
+  TALKING_API_KEY: ${{secrets.SECRET_KEY}}
+
+  TALKING_USERNAME: ${{secrets.SECRET_KEY}}
+
+  TALKING_SHORT_CODE: ${{secrets.SECRET_KEY}}
+
 jobs:
 
   Testing:
