@@ -7,7 +7,7 @@ User=ubuntu
 Group=ubuntu
 RuntimeDirectory=e-wallet
 WorkingDirectory=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet
-Environment="PATH=/home/ubuntu/actions-runner/_work/E-wallet/E-wallet"
+Environment="PATH=/home/ubuntu/.cache/pypoetry/virtualenvs/e-wallet-9r7Hsen0-py3.10"
 ExecStart=poetry run rq worker E-wallet --with-scheduler -c settings
 ExecStop=poerty run flask stop-redis-worker
 [Install]
