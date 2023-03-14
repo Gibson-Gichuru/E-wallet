@@ -38,7 +38,7 @@ def configure_nginx():
             "sudo ln -sf",
             "/etc/nginx/sites-available/e-wallet.conf",
             NGINX_SYMLINK_DIR
-        ),
+        ).split(),
         check=True
     )
 
